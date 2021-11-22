@@ -1,0 +1,14 @@
+{
+  "name": "santorini",
+  "version": "1.0.0",
+  "description": "it's a game of santorini",
+  "main": "index.html",
+  "repository": "https://github.com/jamesnowecki/santorini.git",
+  "author": "James Nowecki",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "sass": "^1.25.0"
+  },
+  "dependencies": {}
+}

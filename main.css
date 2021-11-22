@@ -1,0 +1,302 @@
+body {
+  background-color: white;
+  font-family: "Titillium Web", sans-serif;
+  padding: 0;
+  margin: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+h1 {
+  background-color: blue;
+  color: white;
+  font-family: 'Lobster', cursive;
+  text-align: center;
+  padding: 15px 0;
+  margin: 0;
+}
+
+h2 {
+  text-align: center;
+  padding: 20px 10px;
+  font-weight: normal;
+  font-size: 17px;
+  margin: 0;
+}
+
+#rules-modal {
+  width: 100vw;
+  max-width: 100%;
+  height: 100vh;
+  background-color: rgba(128, 128, 128, 0.6);
+  position: absolute;
+  top: 0px;
+  right: 0px;
+}
+
+#rules-modal #rules-center-box {
+  padding: 30px;
+  background: white;
+}
+
+#rules-modal #rules-center-box ul {
+  list-style-position: outside;
+  margin: 0;
+  padding: 0 0 15px 0;
+}
+
+#rules-modal #rules-center-box ul li {
+  text-align: justify;
+}
+
+#rules-modal #rules-center-box ul li span {
+  font-weight: 900;
+}
+
+.hidden {
+  display: none;
+}
+
+button.non-grid {
+  width: 150px;
+  height: 60px;
+  background-color: blue;
+  border: none;
+  color: white;
+  display: block;
+  margin: 0 auto 20px auto;
+  font-size: 20px;
+  font-weight: 700;
+  border-radius: 10px;
+}
+
+button.non-grid:hover {
+  cursor: pointer;
+}
+
+#game-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+#game-container #dashboard {
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 10px;
+  width: 90vw;
+  padding: 10px;
+  -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
+}
+
+#game-container #dashboard p {
+  display: inline;
+  margin: 2px;
+}
+
+#game-container #dashboard h2 {
+  font-weight: bolder;
+}
+
+#game-container #dashboard .player-color {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: space-evenly;
+      -ms-flex-pack: space-evenly;
+          justify-content: space-evenly;
+}
+
+#game-container #dashboard .key-pair {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+#game-container #dashboard .key-pair .dashboard-key {
+  font-weight: bolder;
+}
+
+#game-container #dashboard .key-pair .color-icon {
+  width: 10px;
+  height: 10px;
+  border: 1px solid black;
+  border-radius: 100%;
+}
+
+#game-container #dashboard .key-pair #iconP1 {
+  background-color: #888888;
+  margin-left: 10px;
+  margin-top: 7px;
+}
+
+#game-container #dashboard .key-pair #iconP2 {
+  background-color: #f19bd5;
+  margin-left: 10px;
+  margin-top: 7px;
+}
+
+#game-container .game-grid {
+  width: 80vw;
+  height: 80vw;
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-gap: 5px;
+  padding: 25px;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 10px;
+  margin: 15px 0;
+  -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+#game-container .game-grid .grid-square:hover {
+  cursor: pointer;
+}
+
+#game-container .game-grid .height-0 {
+  background-color: #c2e085;
+}
+
+#game-container .game-grid .height-1 {
+  background-color: #ffff7c;
+}
+
+#game-container .game-grid .height-2 {
+  background-color: #fabb46;
+}
+
+#game-container .game-grid .height-3 {
+  background-color: #fa755d;
+}
+
+#game-container .game-grid .height-4 {
+  background-color: #4444f8;
+}
+
+#game-container .game-grid .occupied-P1 {
+  background-color: #888888;
+  border-radius: 100%;
+}
+
+#game-container .game-grid .occupied-P2 {
+  background-color: #f19bd5;
+  border-radius: 100%;
+}
+
+#game-container .game-grid .legal-choice {
+  border: 3px solid red;
+}
+
+#game-container .game-grid .piece-to-move {
+  border: 3px solid green;
+}
+
+@media only screen and (min-width: 360px) {
+  #rules-modal {
+    height: 160vh;
+  }
+}
+
+@media only screen and (min-width: 460px) {
+  #rules-modal {
+    height: 180vh;
+  }
+}
+
+@media only screen and (min-width: 555px) {
+  #rules-modal {
+    height: 140vh;
+  }
+  #rules-modal #rules-center-box {
+    width: 400px;
+    background-color: white;
+    position: absolute;
+    top: 10vh;
+    left: calc(50vw - 220px);
+  }
+  #game-container {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+        -ms-flex-direction: row-reverse;
+            flex-direction: row-reverse;
+    margin-bottom: 15px;
+  }
+  #game-container #dashboard {
+    width: 40vw;
+    padding: 25px;
+  }
+  #game-container .game-grid {
+    width: 35vw;
+    height: 35vw;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  #rules-modal {
+    height: 100vh;
+  }
+  #rules-modal #rules-center-box {
+    width: 650px;
+    background-color: white;
+    position: absolute;
+    top: 5vh;
+    left: calc(50vw - 360px);
+  }
+  #game-container {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: reverse;
+        -ms-flex-direction: row-reverse;
+            flex-direction: row-reverse;
+  }
+  #game-container #dashboard {
+    width: 25vw;
+    padding: 25px;
+  }
+  #game-container .game-grid {
+    width: 25vw;
+    height: 25vw;
+  }
+  .legal-choice {
+    border: 4px solid red;
+  }
+  .piece-to-move {
+    border: 4px solid green;
+  }
+}
+/*# sourceMappingURL=main.css.map */
