@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/css?family=Titillium+Web&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lobster&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./main.css">
+    <link rel='shortcut icon' type='image/x-icon' href='./santorini-pic.jpg' />
+    <script src="./main.js" async defer></script>
+    </body>
+    <title>Santorini</title>
+</head>
+
+<body>
+    <h1>Santorini</h1>
+    <h2>A digital version of the classic Gordon Hamilton 2004 abstract boardgame, coded with love, in order to learn and improve my skills with JavaScript.</h2>
+    <button class="non-grid" onclick=removeHidden()>Rules</button>
+
+    <div id="rules-modal" class="hidden">
+        <section  id="rules-center-box">
+            <h2>Rules:</h2>
+            <ul>
+                <li>This is a game for 2 players, who take alternating turns, with player 1 going first.</li>
+                <li>The game starts with a deployment phase, where each player alternates placing their two workers on any empty grid square, which will show on the board as circles filled with grey (player 1) or pink (player 2).</li>
+                <li><span>A turn:</span> After two of each workers are placed, the normal turn sequence begins. Each player alternates turns of selecting their worker (left-click on one of your workers to select), choosing a grid square to move it to (left-click to select), then build on a square to increase its height by one (left-click to build). The turn then passes to the other player.</li>
+                <li><span>Moving:</span> A worker may move to any empty square that your worker can climb up or down on to. A worker can move to any adjacent square (including diagonals) of a lower or equal height, or a square of one higher than the currently occupied square. A worker can never set foot on a 4-height square.</li>
+                <li><span>Building:</span> A worker must build after it moves. If you cannot build the move is illegal and you lose the game. The worker can build on any adjacent square (including diagonals) that is not occupied, assuming there are enough pieces of that height remaining. This increases the height of the square by one, to a maximum height of 4.</li>
+                <li><span>Winning the game:</span> The first player to get a worker stood on a 3-height square wins the game!</li>
+            </ul>
+            <button class="non-grid" id="close-modal-button" onclick=addHidden()>Close</button>
+         </section>
+    </div>
+
+    <div id="game-container">
+        <section id="dashboard">
+            <h2>Pieces remaining:</h2>
+            <div class="player-color">
+                <div class="key-pair">
+                    <p class="dashboard-key">P1</p>
+                    <p class="color-icon" id="iconP1"></p>
+                </div>
+                <div class="key-pair">
+                    <p class="dashboard-key">P2</p>
+                    <p class="color-icon" id="iconP2"></p>
+                </div>
+            </div>
+            <div class="key-pair">
+                <p class="dashboard-key">Level 1 pieces remaining: </p>
+                <p id="level-1-remaining">22</p>
+            </div>
+            <div class="key-pair">
+                <p class="dashboard-key">Level 2 pieces remaining: </p>
+                <p id="level-2-remaining">18</p>
+            </div>
+            <div class="key-pair">
+                <p class="dashboard-key">Level 3 pieces remaining: </p>
+                <p id="level-3-remaining">14</p>
+            </div>
+            <div class="key-pair">
+                <p class="dashboard-key">Level 4 pieces remaining: </p>
+                <p id="level-4-remaining">10</p>
+            </div>
+            <div class="key-pair">
+                <p class="dashboard-key">Turn tracker:</p>
+                <p id="turn-tracker">Player 1's turn</p>
+            </div>
+            <div class="key-pair">
+                <p class="dashboard-key">Game status:</p>
+                <p id="game-status">Deploy a piece</p>
+            </div>
+         </section>
+    
+         <div class="game-grid">
+            <button id="a1" class="grid-square height-0">0</button>
+            <button id="a2" class="grid-square height-0">0</button>
+            <button id="a3" class="grid-square height-0">0</button>
+            <button id="a4" class="grid-square height-0">0</button>
+            <button id="a5" class="grid-square height-0">0</button>
+            <button id="b1" class="grid-square height-0">0</button>
+            <button id="b2" class="grid-square height-0">0</button>
+            <button id="b3" class="grid-square height-0">0</button>
+            <button id="b4" class="grid-square height-0">0</button>
+            <button id="b5" class="grid-square height-0">0</button>
+            <button id="c1" class="grid-square height-0">0</button>
+            <button id="c2" class="grid-square height-0">0</button>
+            <button id="c3" class="grid-square height-0">0</button>
+            <button id="c4" class="grid-square height-0">0</button>
+            <button id="c5" class="grid-square height-0">0</button>
+            <button id="d1" class="grid-square height-0">0</button>
+            <button id="d2" class="grid-square height-0">0</button>
+            <button id="d3" class="grid-square height-0">0</button>
+            <button id="d4" class="grid-square height-0">0</button>
+            <button id="d5" class="grid-square height-0">0</button>
+            <button id="e1" class="grid-square height-0">0</button>
+            <button id="e2" class="grid-square height-0">0</button>
+            <button id="e3" class="grid-square height-0">0</button>
+            <button id="e4" class="grid-square height-0">0</button>
+            <button id="e5" class="grid-square height-0">0</button>
+        </div>
+    </div>
+    <button class="non-grid" onclick="window.location.reload();">Reset game</button>
+</body>
+</html>
