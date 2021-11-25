@@ -28,9 +28,12 @@ let deploymentphase = true;
 
 let isItPlayer1Turn = true;
 
-let isMove = true;
+let isPawnSelected = false;
 
 let currentCell;
+let lastCell;
+
+let selectedPawn; 
 
 function switchTurns(){
     isItPlayer1Turn = !isItPlayer1Turn;
@@ -58,40 +61,42 @@ tbody.addEventListener('click', function (e){
 
     }
 
-    if (isItPlayer1Turn && cell.innerHTML === ""){
-        const placeHolderPlayer1 = "P1a";
-        console.log("Player 1 turn");
-
-        updateArr(cell.id, placeHolderPlayer1);
-        updatePlayingBoard(placeHolderPlayer1);
-
-        switchTurns();
+    if (isItPlayer1Turn && !deploymentphase){
+        
+        selectedPawn = cell.innerHTML;
+        selectPawns(selectedPawn);
+       // findPlayerPosInArr(selected, cell.id);
+        //switchTurns();
         
     }
-    else if(!isItPlayer1Turn && cell.innerHTML === ""){
-        const placeHolderPlayer2 = "P2a";
-        console.log("Player 2 turn");
-
-        updateArr(cell.id, placeHolderPlayer2);
-        updatePlayingBoard(placeHolderPlayer2);
-
+    if(!isItPlayer1Turn && !deploymentphase){
+        
+        selectedPawn = cell.innerHTML;
+        
+        findPlayerPosInArr(selected, cell.id);
+        
         switchTurns();
     }
-    let selected = cell.innerHTML;
-    findElement(selected, cell.id);
+
+    if(isPawnSelected && cell.innerHTML === ""){
+        lastCell = currentCell;
+        console.log(lastCell);
+        currentCell = cell;
+        console.log(currentCell);
+       // console.log(selectedPawn);
+        updatePlayingBoard(selectedPawn);
+
+    }
+    
 });
-function findElement(selected, cellId){
+
+function findPlayerPosInArr(selected, cellId){
     if(isItPlayer1Turn){
-     
-console.log(`Prøver å finne ${selected} med id ${Math.floor(cellId / 5)}`);
-  
+      
 let column = playerposArr[Math.floor(cellId / 5)].indexOf(selected);
 let row = Math.floor(cellId / 5);
 
-console.log("row: " + row);
-console.log("column: " + column);
 console.log(playerposArr[row][column]);
-
 
     }
 }
@@ -127,9 +132,17 @@ function deployPlayers(cellid){
     updatePlayingBoard(placeHolderPlayer);
 }
 
-function movePlayers(){
+function selectPawns(selectedPawn){
 
+console.log("The selected pawn is" + selectedPawn);
 
+isPawnSelected = true;
+
+}
+
+function movePawn(cellText){
+
+updatePlayingBoard(cellText);
 
 }
 
@@ -182,11 +195,14 @@ function updateArr (cellId, cellText){
 }
     
 
-    
-
-
 function updatePlayingBoard(cellText){
 
+    if(deploymentphase){
+        currentCell.innerHTML = cellText;    
+    }
+    else{
+    
     currentCell.innerHTML = cellText;
-
+ //   lastCell.innerHTML = "";
+    }
 }
