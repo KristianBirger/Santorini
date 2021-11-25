@@ -78,20 +78,20 @@ tbody.addEventListener('click', function (e){
         switchTurns();
     }
     let selected = cell.innerHTML;
-    findElement(selected);
+    findElement(selected, cell.id);
 });
-function findElement(selected){
+function findElement(selected, cellId){
     if(isItPlayer1Turn){
      
-       // let selected = cell.innerHTML;
+console.log(`Prøver å finne ${selected} med id ${Math.floor(cellId / 5)}`);
+  
+let column = playerposArr[Math.floor(cellId / 5)].indexOf(selected);
+let row = Math.floor(cellId / 5);
 
-        let find=0;
-        find = playerposArr.indexOf(`\"${selected}\"`);
-        console.log(find, " selected: " + selected);
+console.log("row: " + row);
+console.log("column: " + column);
+console.log(playerposArr[row][column]);
 
-
-
-        //cell.innerHTML = "";
 
     }
 }
@@ -173,7 +173,7 @@ function updateArr (cellId, cellText){
       
         cellId = cellId % 5;
       
-        playerposArr[3][cellId] = cellText;
+        playerposArr[4][cellId] = cellText;
         
         console.log(playerposArr);
     
