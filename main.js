@@ -25,15 +25,18 @@ let mapArr = [
 ];
 
 let deploymentphase = true; 
-let deployCount = 0;
 
 let isItPlayer1Turn = true;
+
+let isMove = true;
 
 let currentCell;
 
 function switchTurns(){
     isItPlayer1Turn = !isItPlayer1Turn;
 };
+
+let deployCount = 0;
 
 const tbody = document.querySelector('#SantoTable tbody');
 tbody.addEventListener('click', function (e){
@@ -43,39 +46,16 @@ tbody.addEventListener('click', function (e){
   if (!cell) {
     return;
     }
-
+    //Player 1 deploy
     if(deploymentphase && isItPlayer1Turn && cell.innerHTML === "" && deployCount < 2){
 
-        const placeHolderPlayer1 = `P1-${deployCount}`;
-        console.log("Player 1 turn");
-
-        updateArr(cell.id, placeHolderPlayer1);
-        updatePlayingBoard(placeHolderPlayer1);
-
-        deployCount ++;
-        if (deployCount === 2){
-            switchTurns();
-            deployCount = 0;
-        }
-        
+        deployPlayers(cell.id);
     }
 
     if(deploymentphase && !isItPlayer1Turn && cell.innerHTML === "" && deployCount < 2){
-      
 
-        const placeHolderPlayer2 = `P2-${deployCount}`;
-        console.log("Player 1 turn");
+        deployPlayers(cell.id);
 
-        updateArr(cell.id, placeHolderPlayer2);
-        updatePlayingBoard(placeHolderPlayer2);
-
-        deployCount ++
-        
-        if (deployCount === 2){
-            switchTurns();
-            console.log("Deployment phase over")
-            deploymentphase = false;
-        }
     }
 
     if (isItPlayer1Turn && cell.innerHTML === ""){
@@ -97,14 +77,113 @@ tbody.addEventListener('click', function (e){
 
         switchTurns();
     }
+    let selected = cell.innerHTML;
+    findElement(selected);
 });
+function findElement(selected){
+    if(isItPlayer1Turn){
+     
+       // let selected = cell.innerHTML;
+
+        let find=0;
+        find = playerposArr.indexOf(`\"${selected}\"`);
+        console.log(find, " selected: " + selected);
+
+
+
+        //cell.innerHTML = "";
+
+    }
+}
+
+function deployPlayers(cellid){
+
+    let placeHolderPlayer; 
+
+    if(isItPlayer1Turn){
+    placeHolderPlayer = `P1-${deployCount}`;
+    console.log("Player 1 turn");
+
+    deployCount ++;
+    if (deployCount === 2){
+        switchTurns();
+        deployCount = 0;
+    }
+}
+    else{
+        placeHolderPlayer = `P2-${deployCount}`;
+        console.log("Player 2 turn");
+
+        deployCount ++
+        
+        if (deployCount === 2){
+            switchTurns();
+            console.log("Deployment phase over")
+            deploymentphase = false;
+        }
+    }
+
+    updateArr(cellid, placeHolderPlayer);
+    updatePlayingBoard(placeHolderPlayer);
+}
+
+function movePlayers(){
+
+
+
+}
+
 
 function updateArr (cellId, cellText){
 
-    playerposArr[0][cellId] = cellText;
-    console.log(playerposArr);
-
+    if (cellId < 5) {
+  
+        playerposArr[0][cellId] = cellText;
+        console.log(playerposArr);
+      
+      
+    }
+    else if (cellId > 4 && cellId < 10) {
+      
+      cellId = cellId % 5;
+    
+      playerposArr[1][cellId] = cellText;
+      
+      console.log(playerposArr);
+    }
+    else if (cellId > 9 && cellId < 15) {
+      
+        cellId = cellId % 5;
+      
+        playerposArr[2][cellId] = cellText;
+        
+        console.log(playerposArr);
+    
+    }
+    else if (cellId > 14 && cellId < 20) {
+      
+        cellId = cellId % 5;
+      
+        playerposArr[3][cellId] = cellText;
+        
+        console.log(playerposArr);
+    
+    }
+    else if (cellId > 13 && cellId < 25) {
+      
+        cellId = cellId % 5;
+      
+        playerposArr[3][cellId] = cellText;
+        
+        console.log(playerposArr);
+    
+    }
+    
 }
+    
+
+    
+
 
 function updatePlayingBoard(cellText){
 
