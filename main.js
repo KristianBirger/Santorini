@@ -82,7 +82,8 @@ tbody.addEventListener('click', function (e){
        
         console.log("The previous cell " + lastCell.id);
         updatePlayingBoard(selectedPawn);
-        updateArr();
+        updateArr(cell.id, selectedPawn);
+        findPlayerPosInArr(selectedPawn, lastCell.id);
 
     }
     
@@ -94,7 +95,8 @@ function findPlayerPosInArr(selected, cellId){
 let column = playerposArr[Math.floor(cellId / 5)].indexOf(selected);
 let row = Math.floor(cellId / 5);
 
-console.log(playerposArr[row][column]);
+playerposArr[row][column] = 0;
+console.log("test" + playerposArr[row][column]);
 
     }
 }
@@ -145,6 +147,9 @@ updatePlayingBoard(cellText);
 
 }
 
+function removeFromArr(){
+
+}
 
 function updateArr (cellId, cellText){
 
