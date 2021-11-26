@@ -61,15 +61,15 @@ tbody.addEventListener('click', function (e){
 
     }
 
-    if (isItPlayer1Turn && !deploymentphase){
-        
+    else if (isItPlayer1Turn && !deploymentphase && !isPawnSelected){
+        lastCell = currentCell;
         selectedPawn = cell.innerHTML;
         selectPawns(selectedPawn);
        // findPlayerPosInArr(selected, cell.id);
         //switchTurns();
         
     }
-    if(!isItPlayer1Turn && !deploymentphase){
+    else if(!isItPlayer1Turn && !deploymentphase){
         
         selectedPawn = cell.innerHTML;
         
@@ -78,13 +78,11 @@ tbody.addEventListener('click', function (e){
         switchTurns();
     }
 
-    if(isPawnSelected && cell.innerHTML === ""){
-        lastCell = currentCell;
-        console.log(lastCell);
-        currentCell = cell;
-        console.log(currentCell);
-       // console.log(selectedPawn);
+    else if(isPawnSelected && cell.innerHTML === ""){
+       
+        console.log("The previous cell " + lastCell.id);
         updatePlayingBoard(selectedPawn);
+        updateArr();
 
     }
     
@@ -119,12 +117,13 @@ function deployPlayers(cellid){
         placeHolderPlayer = `P2-${deployCount}`;
         console.log("Player 2 turn");
 
-        deployCount ++
+        deployCount ++;
         
         if (deployCount === 2){
             switchTurns();
-            console.log("Deployment phase over")
             deploymentphase = false;
+            console.log("Deployment phase over")
+            
         }
     }
 
@@ -199,6 +198,16 @@ function updatePlayingBoard(cellText){
 
     if(deploymentphase){
         currentCell.innerHTML = cellText;    
+    }
+
+    else if(isPawnSelected){
+
+        currentCell.innerHTML = cellText;
+        lastCell.innerHTML = "";
+        isPawnSelected = false;
+        console.log("selecpawn is " + isPawnSelected);
+
+
     }
     else{
     

@@ -1,3 +1,4 @@
+
 let htmlTable = document.getElementById("SantoTable");
 
 let p1a = {
@@ -61,12 +62,12 @@ tbody.addEventListener('click', function (e){
 
     if (isItPlayer1Turn && cell.innerHTML === ""){
        
-        switchTurns();
+      //  switchTurns();
         
     }
     else if(!isItPlayer1Turn && cell.innerHTML === ""){
         
-        switchTurns();
+       // switchTurns();
     }
  
     let selected = cell.innerHTML;
@@ -74,29 +75,26 @@ tbody.addEventListener('click', function (e){
 });
 
 function findElement(selected ,id){
-   console.log(isItPlayer1Turn);
+   ///console.log(isItPlayer1Turn);
     let pArry1Index=Math.floor(id/5);
-
-        let pArry2Index = playerposArr[Math.floor(id/5)].indexOf(selected);
-
+    let pArry2Index = playerposArr[Math.floor(id/5)].indexOf(selected);
+    console.log("collum "+pArry2Index + " row " + pArry1Index);
     if(isItPlayer1Turn && !deploymentphase){
         //let findIndexOf=playerposArr[Math.floor(id/5)].indexOf(selected);
-        
+        console.log("pArry1 " + pArry1Index + " pArry2 " + pArry2Index);
         
         if(pArry2Index>=0){
             playerSelect=true;
-            console.log("player er nå true");
-        }
-        console.log(pArry1Index + " P array:  " + pArry2Index);
-        
+            console.log("playerSelect er nå true");
 
+        }
         
     }
 // Bruk p1a.posrow for nedover og p1a.col for bortover
     if(playerSelect===true && outOfBounds(pArry1Index,pArry2Index) && !deploymentphase){
         
         p1a.posrow=pArry1Index;
-        p1a.poscol=pArry2Index;
+        p1a.poscol=id%5;
         console.log("p1a er nå satt til col: " + p1a.poscol + " p1a er satt til row: " + p1a.posrow);
         playerSelect=false;
     }
@@ -119,8 +117,6 @@ function outOfBounds(newPosrow,newPoscol){
             if(col===newPoscol|| row+1!==row+i&&col+1==newPoscol || col+2===newPoscol){
                 return true;
             }
-            
-
         }
     }
     
@@ -148,17 +144,14 @@ function deployPlayers(cellid){
         placeHolderPlayer = `P2-${deployCount}`;
         console.log("Player 2 turn");
 
-        if(deployCount === 2){
-        deploymentphase = false;
-        console.log("Deployment phase over")
-
-        }
+        
 
         deployCount ++
 
         if (deployCount === 2){
-            switchTurns(); 
-           
+            switchTurns();
+            deploymentphase = false;
+            console.log("Deployment phase over");
         }
         
     }
@@ -167,11 +160,7 @@ function deployPlayers(cellid){
     updatePlayingBoard(placeHolderPlayer);
 }
 
-function movePlayers(){
-
-
-
-}
+//function movePlayers(){}
 
 
 function updateArr (cellId, cellText){
