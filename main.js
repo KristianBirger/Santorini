@@ -95,6 +95,7 @@ function findPlayerPosInArr(selected, cellId){
 let column = playerposArr[Math.floor(cellId / 5)].indexOf(selected);
 let row = Math.floor(cellId / 5);
 
+//Remove from array
 playerposArr[row][column] = 0;
 console.log("test" + playerposArr[row][column]);
 
