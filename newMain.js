@@ -1,5 +1,5 @@
-
 let htmlTable = document.getElementById("SantoTable");
+let infoText = document.getElementById("infoText");
 
 let p1a = {
     poscol:0,
@@ -7,7 +7,8 @@ let p1a = {
     };
 
 let p1b = {
-       
+    poscol:0,
+    posrow:0
 };
 
 let playerposArr = [
@@ -30,16 +31,31 @@ let deploymentphase = true;
 
 let isItPlayer1Turn = true;
 
-let isMove = true;
+let isPawnSelected = false;
 
 let currentCell;
+let previousCell;
+let previousRow;
+let previousCol;
+let selectedPawn; 
 
 function switchTurns(){
     isItPlayer1Turn = !isItPlayer1Turn;
+
+
+    if(isItPlayer1Turn && !deploymentphase){
+        infoText.innerHTML = "Player 1 turn, select a pawn to move";
+        
+    }
+    else if(!isItPlayer1Turn && !deploymentphase) {
+        infoText.innerHTML = "Player 2 turn, select a pawn to move";
+        
+    };
+
 };
 
 let deployCount = 0;
-let playerSelect=false;
+
 const tbody = document.querySelector('#SantoTable tbody');
 tbody.addEventListener('click', function (e){
   const cell = e.target.closest('td');
@@ -60,71 +76,73 @@ tbody.addEventListener('click', function (e){
 
     }
 
-    if (isItPlayer1Turn && cell.innerHTML === ""){
+    else if (isItPlayer1Turn && !deploymentphase && !isPawnSelected){
+
+        if((cell.innerHTML).includes("P1")){
+
+        previousCell = currentCell;
+        previousRow = Math.floor(cell.id/5);
+        previousCol = cell.id%5;
+        selectedPawn = cell.innerHTML;
+        selectPawns(selectedPawn);
+
+
        
-      //  switchTurns();
+     
+        }
+
+        else{
+            infoText.innerHTML = "Wrong pawn my guy!";
+        }
+
+      
         
     }
-    else if(!isItPlayer1Turn && cell.innerHTML === ""){
+    else if(!isItPlayer1Turn && !deploymentphase && !isPawnSelected){
         
-       // switchTurns();
+        if((cell.innerHTML).includes("P2")){
+
+        previousCell = currentCell;
+        previousRow = Math.floor(cell.id/5);
+        previousCol = cell.id%5;
+        selectedPawn = cell.innerHTML;
+        selectPawns(selectedPawn);
+
+
+        
+        }
+
+        else{
+            infoText.innerHTML = "Wrong pawn my guy!";
+        }
+
     }
- 
-    let selected = cell.innerHTML;
-    findElement(selected, cell.id);
+
+    else if(isPawnSelected && cell.innerHTML === ""){
+       
+        console.log("The previous cell " + previousCell.id);
+        updatePlayingBoard(selectedPawn);
+        updateArr(cell.id, selectedPawn);
+        findPlayerPosInArr(selectedPawn, previousCell.id);
+
+      
+    }
+    
 });
 
-function findElement(selected ,id){
-   ///console.log(isItPlayer1Turn);
-    let pArry1Index=Math.floor(id/5);
-    let pArry2Index = playerposArr[Math.floor(id/5)].indexOf(selected);
-    console.log("collum "+pArry2Index + " row " + pArry1Index);
-    if(isItPlayer1Turn && !deploymentphase){
-        //let findIndexOf=playerposArr[Math.floor(id/5)].indexOf(selected);
-        console.log("pArry1 " + pArry1Index + " pArry2 " + pArry2Index);
-        
-        if(pArry2Index>=0){
-            playerSelect=true;
-            console.log("playerSelect er nå true");
-
-        }
-        
-    }
-// Bruk p1a.posrow for nedover og p1a.col for bortover
-    if(playerSelect===true && outOfBounds(pArry1Index,pArry2Index) && !deploymentphase){
-        
-        p1a.posrow=pArry1Index;
-        p1a.poscol=id%5;
-        console.log("p1a er nå satt til col: " + p1a.poscol + " p1a er satt til row: " + p1a.posrow);
-        playerSelect=false;
-    }
-
-   
-}
-function outOfBounds(newPosrow,newPoscol){
-    let col=p1a.poscol -1;
-    let row =p1a.posrow -1;
-    for(let i=0;i<2;i++){
-        if(
-        col+i=== newPoscol || col+2===newPoscol){
-            if(row===newPosrow || col+1!==col+i&&row+1==newPosrow || row+2===newPosrow){
-                return true;
-            }
-        }
-
-        if(
-        row+i === newPosrow|| row+2 === newPosrow){
-            if(col===newPoscol|| row+1!==row+i&&col+1==newPoscol || col+2===newPoscol){
-                return true;
-            }
-        }
-    }
-    
+function findPlayerPosInArr(selected, cellId){
   
+      
+let column = playerposArr[Math.floor(cellId / 5)].indexOf(selected);
+let row = Math.floor(cellId / 5);
 
-}
+//Remove from array
+console.log("Removing this " + playerposArr[row][column]);
+playerposArr[row][column] = 0;
+
 
     
+}
 
 function deployPlayers(cellid){
 
@@ -144,31 +162,49 @@ function deployPlayers(cellid){
         placeHolderPlayer = `P2-${deployCount}`;
         console.log("Player 2 turn");
 
+        deployCount ++;
         
-
-        deployCount ++
-
         if (deployCount === 2){
             switchTurns();
             deploymentphase = false;
             console.log("Deployment phase over");
+            infoText.innerHTML = "Player 1 turn, select a pawn to move";
+            
         }
-        
     }
 
     updateArr(cellid, placeHolderPlayer);
     updatePlayingBoard(placeHolderPlayer);
 }
 
-//function movePlayers(){}
+function selectPawns(selectedPawn){
 
+console.log("The selected pawn is" + selectedPawn);
+infoText.innerHTML = "Move your pawn";
+isPawnSelected = true;
+
+
+
+}
+
+function movePawn(cellText){
+
+updatePlayingBoard(cellText);
+
+}
+
+function removeFromArr(){
+
+}
 
 function updateArr (cellId, cellText){
 
     if (cellId < 5) {
+  
         playerposArr[0][cellId] = cellText;
         console.log(playerposArr);
-        
+      
+      
     }
     else if (cellId > 4 && cellId < 10) {
       
@@ -209,11 +245,45 @@ function updateArr (cellId, cellText){
 }
     
 
-    
-
-
 function updatePlayingBoard(cellText){
+    let newPosRow = Math.floor(currentCell.id/5);
+    let newPosCol = currentCell.id % 5;
+    if(deploymentphase){
+        currentCell.innerHTML = cellText;    
+    }
 
-    currentCell.innerHTML = cellText;
+    else if(isPawnSelected){
+       
+        if(inRange(previousCol, newPosCol) && inRange(previousRow, newPosRow)){
+           
+            currentCell.innerHTML = cellText;
+            previousCell.innerHTML = "";
+            isPawnSelected = false;
+   
+            switchTurns();
+
+            }   
+            else{
+            console.log(" Funket ikke ");
+            infoText.innerHTML = "Your pawn can only move to the adjacent tiles";
+             }
+
+        
+
+            console.log("selecpawn is " + isPawnSelected);
+    }
+    else{
+        currentCell.innerHTML = cellText;
+          //  console.log(" Du trykket utenfor ");
+        
+    
+        
+    }
+}
+function inRange(old,newer){
+    
+    let max = old+1;
+    let min = old-1;
+    return ((newer-min)*(newer-max)<=0);
 
 }
