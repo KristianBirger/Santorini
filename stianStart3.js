@@ -37,7 +37,7 @@ let lastCell;
 let lastRow;
 let lastCol;
 let selectedPawn; 
-
+let isBuilding=false;
 function switchTurns(){
     isItPlayer1Turn = !isItPlayer1Turn;
 };
@@ -45,6 +45,7 @@ function switchTurns(){
 let deployCount = 0;
 
 const tbody = document.querySelector('#SantoTable tbody');
+const tBuild=document.querySelector('#SantoTable tbody');
 tbody.addEventListener('click', function (e){
   const cell = e.target.closest('td');
   currentCell = cell;
@@ -65,6 +66,7 @@ tbody.addEventListener('click', function (e){
     }
 
     else if (isItPlayer1Turn && !deploymentphase && !isPawnSelected){
+        if((cell.innerHTML).includes("P1")){
         lastCell = currentCell;
         lastRow=Math.floor(cell.id/5);
         lastCol=cell.id%5;
@@ -72,7 +74,7 @@ tbody.addEventListener('click', function (e){
         selectPawns(selectedPawn);
        // findPlayerPosInArr(selected, cell.id);
         //switchTurns();
-        
+    }
     }
     else if(!isItPlayer1Turn && !deploymentphase){
         
@@ -213,18 +215,27 @@ function updatePlayingBoard(cellText){
     }
 
     else if(isPawnSelected){
-       
-        if(inRange(lastCol, newPosCol) && inRange(lastRow, newPosRow)){
+        console.log("selecpawn is " + isPawnSelected);
+        if(whereIstand(newPosRow,newPosCol)){
            
             currentCell.innerHTML = cellText;
             lastCell.innerHTML = "";
             isPawnSelected = false;
-        console.log("vi flyttet her når last col: " +lastCol + " og når lastRow: " + lastRow + " og newPosCol: " + newPosCol + " og newPosRow: " + newPosRow);
-    }else{
-        console.log(" Funket ikke ");
-    }
+
+            isBuilding=true;
+            
+            
+        console.log("is_building "+isBuilding+" is_pawn "+ isPawnSelected);
+        }else{
+                console.log(" Funket ikke ");
+        }
     
-        console.log("selecpawn is " + isPawnSelected);
+        
+    }else if(isBuilding){
+        if(whereIstand()){
+            building(currentRow,currentColl);
+            isBuilding=false;
+        }
     }
     else{
         currentCell.innerHTML = cellText;
@@ -235,9 +246,30 @@ function updatePlayingBoard(cellText){
     }
 }
 function inRange(old,newer){
-    
+    console.log(old +"newr "+newer);
     let max=old+1;
     let min=old-1;
-    return ((newer-min)*(newer-max)<=0);
+    
+       
+    
+        return ((newer-min)*(newer-max)<=0);
+    
+   
 
+}
+function building(currentRow,currentColl){
+    
+        console.log("sett building up by 1 ")
+        return mapArr[currentRow][currentColl]++;
+    
+ 
+
+};
+function whereIstand(newPosRow,newPosCol){
+    if(lastCol===newPosCol && newPosCol ===newPosRow){
+        return false;
+    }
+    else if(inRange(lastCol, newPosCol) && inRange(lastRow, newPosRow) && inRange(mapArr[lastRow][lastCol], mapArr[newPosRow][newPosCol])){
+        return true;
+    }
 }
