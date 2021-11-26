@@ -7,6 +7,8 @@ let p1a = {
     };
 
 let p1b = {
+    poscol:0,
+    posrow:0
        
 };
 
@@ -31,6 +33,8 @@ let deploymentphase = true;
 let isItPlayer1Turn = true;
 
 let isMove = true;
+
+let p1true=false;//skjekker om du trykket p1-0
 
 let currentCell;
 
@@ -62,15 +66,19 @@ tbody.addEventListener('click', function (e){
 
     if (isItPlayer1Turn && cell.innerHTML === ""){
        
-        switchTurns();
+       // switchTurns();
         
     }
     else if(!isItPlayer1Turn && cell.innerHTML === ""){
         
-        switchTurns();
+        //switchTurns();
     }
  
     let selected = cell.innerHTML;
+    
+    if(selected==="P1-0" && !deploymentphase){
+        p1true=true; console.log(" p1true er nå "+p1true);
+    }
     findElement(selected, cell.id);
 });
 
@@ -78,23 +86,19 @@ function findElement(selected ,id){
    ///console.log(isItPlayer1Turn);
     let pArry1Index=Math.floor(id/5);
     let pArry2Index = playerposArr[Math.floor(id/5)].indexOf(selected);
-    console.log("collum "+pArry2Index + " row " + pArry1Index);
+    console.log("pArry1 " + pArry1Index + " pArry2 " + pArry2Index+  " id: "+ id%5);
     if(isItPlayer1Turn && !deploymentphase){
         //let findIndexOf=playerposArr[Math.floor(id/5)].indexOf(selected);
-        console.log("pArry1 " + pArry1Index + " pArry2 " + pArry2Index);
-        
         if(pArry2Index>=0){
             playerSelect=true;
+
             console.log("playerSelect er nå true");
 
         }
-       
-        
-
-        
     }
 // Bruk p1a.posrow for nedover og p1a.col for bortover
-    if(playerSelect===true && outOfBounds(pArry1Index,pArry2Index) && !deploymentphase){
+console.log("out_bounce "+outOfBounds(pArry1Index,id%5,p1true) +" player_selected " + playerSelect + " deployment? " + !deploymentphase);
+    if(playerSelect===true && outOfBounds(pArry1Index,id%5,p1true) && !deploymentphase){
         
         p1a.posrow=pArry1Index;
         p1a.poscol=id%5;
@@ -104,22 +108,33 @@ function findElement(selected ,id){
 
    
 }
-function outOfBounds(newPosrow,newPoscol){
-    let col=p1a.poscol -1;
-    let row =p1a.posrow -1;
+
+function outOfBounds(newPosrow,newPoscol,selectedP10){
+    console.log(newPosrow + " dette er pos col: "+ newPosrow);
+    let col=0;
+    let row=0;
+    
+    if(selectedP10==="P1-0"){
+         col=p1a.poscol -1;
+         row =p1a.posrow -1;
+         console.log("funket dette ? ");
+        p1True=false;
+    }else{
+         col=p1b.poscol -1;
+         row =p1b.posrow -1;
+    }
+    
     for(let i=0;i<2;i++){
-        if(
-        col+i=== newPoscol || col+2===newPoscol){
+        if( col+i=== newPoscol || col+2===newPoscol){
             if(row===newPosrow || col+1!==col+i&&row+1==newPosrow || row+2===newPosrow){
                 return true;
             }
-        }
+        }else{ return false;}
 
-        if(
-        row+i === newPosrow|| row+2 === newPosrow){
+        if( row+i === newPosrow|| row+2 === newPosrow){
             if(col===newPoscol|| row+1!==row+i&&col+1==newPoscol || col+2===newPoscol){
                 return true;
-            }
+            }else{return false;}
             
 
         }
@@ -218,7 +233,23 @@ function updateArr (cellId, cellText){
 
 
 function updatePlayingBoard(cellText){
-
+    
+    let setP1aRow= Math.floor(currentCell.id/5);
+    let setP1aCol= currentCell.id%5;
+    //let setP1bRow= Math.floor(currentCell.id/5);
+    //let setP1bCol= currentCell.id%5;
+    
     currentCell.innerHTML = cellText;
-
+    console.log(" Dette er for objektett col: "+setP1aCol+ " row: " + setP1aRow );
+    if(currentCell.innerHTML==="P1-0"){
+        
+        p1a.posrow=setP1aRow;
+        p1a.poscol=setP1aCol;
+        console.log (" in start p1a: row "+p1a.posrow +" collum: "+ p1a.poscol);
+    }
+    if(currentCell.innerHTML=== "P1-1"){
+        p1b.posrow=setP1aRow;
+        p1b.poscol=setP1aCol;
+        console.log (" in start p1b: row "+p1b.posrow +" collum: "+ p1b.poscol);
+    }
 }
