@@ -65,8 +65,9 @@ tbody.addEventListener('click', function (e){
 
     }
 
-    else if (isItPlayer1Turn && !deploymentphase && !isPawnSelected){
-        if((cell.innerHTML).includes("P1")){
+    else if((cell.innerHTML).includes("P1")){
+    if (isItPlayer1Turn && !deploymentphase && !isPawnSelected){
+        
         lastCell = currentCell;
         lastRow=Math.floor(cell.id/5);
         lastCol=cell.id%5;
@@ -92,6 +93,13 @@ tbody.addEventListener('click', function (e){
         updateArr(cell.id, selectedPawn);
         findPlayerPosInArr(selectedPawn, lastCell.id);
 
+    }else if(isBuilding && !isPawnSelected && cell.innerHTML === ""){
+        let currentRow = Math.floor(currentCell.id/5);
+        let currentColl = currentCell.id%5;
+        building(currentRow,currentColl);
+        updatePlayingBoard(selectedPawn);
+        console.log("mapArr: ");
+        console.log(mapArr);
     }
     
 });
@@ -233,8 +241,10 @@ function updatePlayingBoard(cellText){
         
     }else if(isBuilding){
         if(whereIstand()){
-            building(currentRow,currentColl);
+            building(newPosRow,newPosCol);
+            console.log(mapArr);
             isBuilding=false;
+            
         }
     }
     else{
@@ -246,21 +256,16 @@ function updatePlayingBoard(cellText){
     }
 }
 function inRange(old,newer){
-    console.log(old +"newr "+newer);
+    console.log(old +" newer "+newer);
     let max=old+1;
     let min=old-1;
-    
-       
-    
         return ((newer-min)*(newer-max)<=0);
-    
-   
-
 }
 function building(currentRow,currentColl){
     
         console.log("sett building up by 1 ")
         return mapArr[currentRow][currentColl]++;
+        
     
  
 

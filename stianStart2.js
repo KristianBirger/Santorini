@@ -1,16 +1,32 @@
+import defaultExport from stianStart.js;
 
 let htmlTable = document.getElementById("SantoTable");
+let infoText = document.getElementById("infoText");
 
-let p1a = {
-    poscol:0,
-    posrow:0
-    };
+//spillet skal gå i rekkefølge - Primært er dette hvordan det skal på gå
+// status 1 = player 1 setter brikkene på banen
+// status 2 = player 2 setter brikkene på banen
+// status 3 = player 1 skal selecte en brikke
+// status 4 = player 1 skal selecte plassen brikken skal flyttes til
+// status 5 = player 1 skal selecte plassen brikken skal bygge
 
-let p1b = {
-    poscol:0,
-    posrow:0
-       
-};
+//---- siden player 1 og 2 er like så kan vi sette status x boolean player1=true
+// ----- da er statusen redusert til 1 p1+p2, 2,3,4,5.
+
+// status 6 = player 2 skal selecte en brikke
+// status 7 = player 2 skal selecte plassen brikken skal flyttes til.
+// status 8 = player 2 skal selecte plassen brikken skal bygge.
+
+// status 9 = første som står på bygning nivå 3 har vunnet.
+
+//under status 3+6 skal player som har selectett en brikke kunne angre.
+//under status 4+7 skal brikken skjekkes om det er låv å gå vidre eller starte på nytt, rekursiv funksjon
+//under status 5+8 skal byggin ikke pågå der en annen player står og ikke på seg selv, heller ikke på en 4 nivå bygning.
+
+let status=["deploy","select", "move", "build","Win"];// status index 0,1,2,3,4
+
+let player1=true;//bestemmer hvilken sin tur det er å trykke med musen.
+
 
 let playerposArr = [
     [0,0,0,0,0],
@@ -29,21 +45,15 @@ let mapArr = [
 ];
 
 let deploymentphase = true; 
-
 let isItPlayer1Turn = true;
-
-let isMove = true;
-
-let p1true=false;//skjekker om du trykket p1-0
-
+let isPawnSelected = false;
 let currentCell;
-
-function switchTurns(){
-    isItPlayer1Turn = !isItPlayer1Turn;
-};
-
+let previousCell;
+let selectedPawn; 
+let isBuilding = false;
 let deployCount = 0;
-let playerSelect=false;
+
+
 const tbody = document.querySelector('#SantoTable tbody');
 tbody.addEventListener('click', function (e){
   const cell = e.target.closest('td');
@@ -62,194 +72,64 @@ tbody.addEventListener('click', function (e){
 
         deployPlayers(cell.id);
 
+    }else if(isBuilding && !isPawnSelected && cell.innerHTML === ""){
+        let currentRow = Math.floor(currentCell.id/5);
+        let currentColl = currentCell.id%5;
+
+        building(currentRow,currentColl);
+        
+        updatePlayingBoard(selectedPawn);
+        isBuilding=false;
+        console.log("mapArr: ");
+        console.log(mapArr);// for å se om mapet bygges
     }
 
-    if (isItPlayer1Turn && cell.innerHTML === ""){
+
+    else if (isItPlayer1Turn && !deploymentphase && !isPawnSelected){
+        
+        if((cell.innerHTML).includes("P1")){
+            console.log("uuuh" + (cell.innerHTML).includes("P1"));
+        
+        previousCell = currentCell;
+        selectedPawn = cell.innerHTML;
+        selectPawns(selectedPawn);
+        }
+        else{
+            infoText.innerHTML = "Wrong pawn my guy!";
+        }
+
        
-       // switchTurns();
+        
         
     }
-    else if(!isItPlayer1Turn && cell.innerHTML === ""){
+    else if(!isItPlayer1Turn && !deploymentphase && !isPawnSelected){
         
-        //switchTurns();
+        if((cell.innerHTML).includes("P2")){
+            console.log("uuuh" + (cell.innerHTML).includes("P2"));
+            
+        previousCell = currentCell;
+        selectedPawn = cell.innerHTML;
+        selectPawns(selectedPawn);
+        }
+        else{
+            infoText.innerHTML = "Wrong pawn my guy!";
+        }
+
     }
- 
-    let selected = cell.innerHTML;
+
+    else if(isPawnSelected && cell.innerHTML === ""){
+       
+        console.log("The previous cell " + previousCell.id);
+        updatePlayingBoard(selectedPawn);
+        updateArr(cell.id, selectedPawn);
+        findPlayerPosInArr(selectedPawn, previousCell.id);
+
+    }
     
-    if(selected==="P1-0" && !deploymentphase){
-        p1true=true; console.log(" p1true er nå "+p1true);
-    }
-    findElement(selected, cell.id);
 });
 
-function findElement(selected ,id){
-   ///console.log(isItPlayer1Turn);
-    let pArry1Index=Math.floor(id/5);
-    let pArry2Index = playerposArr[Math.floor(id/5)].indexOf(selected);
-    console.log("pArry1 " + pArry1Index + " pArry2 " + pArry2Index+  " id: "+ id%5);
-    if(isItPlayer1Turn && !deploymentphase){
-        //let findIndexOf=playerposArr[Math.floor(id/5)].indexOf(selected);
-        if(pArry2Index>=0){
-            playerSelect=true;
-
-            console.log("playerSelect er nå true");
-
-        }
-    }
-// Bruk p1a.posrow for nedover og p1a.col for bortover
-console.log("out_bounce "+outOfBounds(pArry1Index,id%5,p1true) +" player_selected " + playerSelect + " deployment? " + !deploymentphase);
-    if(playerSelect===true && outOfBounds(pArry1Index,id%5,p1true) && !deploymentphase){
-        
-        p1a.posrow=pArry1Index;
-        p1a.poscol=id%5;
-        console.log("p1a er nå satt til col: " + p1a.poscol + " p1a er satt til row: " + p1a.posrow);
-        playerSelect=false;
-    }
-
-   
-}
-
-function outOfBounds(newPosrow,newPoscol,selectedP10){
-    console.log(newPosrow + " dette er pos col: "+ newPosrow);
-    let col=0;
-    let row=0;
-    
-    if(selectedP10==="P1-0"){
-         col=p1a.poscol -1;
-         row =p1a.posrow -1;
-         console.log("funket dette ? ");
-        p1True=false;
-    }else{
-         col=p1b.poscol -1;
-         row =p1b.posrow -1;
-    }
-    
-    for(let i=0;i<2;i++){
-        if( col+i=== newPoscol || col+2===newPoscol){
-            if(row===newPosrow || col+1!==col+i&&row+1==newPosrow || row+2===newPosrow){
-                return true;
-            }
-        }else{ return false;}
-
-        if( row+i === newPosrow|| row+2 === newPosrow){
-            if(col===newPoscol|| row+1!==row+i&&col+1==newPoscol || col+2===newPoscol){
-                return true;
-            }else{return false;}
-            
-
-        }
-    }
-    
-  
-
-}
-
-    
-
-function deployPlayers(cellid){
-
-    let placeHolderPlayer; 
-
-    if(isItPlayer1Turn){
-    placeHolderPlayer = `P1-${deployCount}`;
-    console.log("Player 1 turn");
-
-    deployCount ++;
-    if (deployCount === 2){
-        switchTurns();
-        deployCount = 0;
-    }
-}
-    else{
-        placeHolderPlayer = `P2-${deployCount}`;
-        console.log("Player 2 turn");
-
-        
-
-        deployCount ++
-
-        if (deployCount === 2){
-            switchTurns();
-            deploymentphase = false;
-            console.log("Deployment phase over");
-        }
-        
-    }
-
-    updateArr(cellid, placeHolderPlayer);
-    updatePlayingBoard(placeHolderPlayer);
-}
-
-//function movePlayers(){}
-
-
-function updateArr (cellId, cellText){
-
-    if (cellId < 5) {
-        playerposArr[0][cellId] = cellText;
-        console.log(playerposArr);
-        
-    }
-    else if (cellId > 4 && cellId < 10) {
-      
-      cellId = cellId % 5;
-    
-      playerposArr[1][cellId] = cellText;
-      
-      console.log(playerposArr);
-    }
-    else if (cellId > 9 && cellId < 15) {
-      
-        cellId = cellId % 5;
-      
-        playerposArr[2][cellId] = cellText;
-        
-        console.log(playerposArr);
-    
-    }
-    else if (cellId > 14 && cellId < 20) {
-      
-        cellId = cellId % 5;
-      
-        playerposArr[3][cellId] = cellText;
-        
-        console.log(playerposArr);
-    
-    }
-    else if (cellId > 13 && cellId < 25) {
-      
-        cellId = cellId % 5;
-      
-        playerposArr[4][cellId] = cellText;
-        
-        console.log(playerposArr);
-    
-    }
-    
-}
-    
 
     
 
 
-function updatePlayingBoard(cellText){
-    
-    let setP1aRow= Math.floor(currentCell.id/5);
-    let setP1aCol= currentCell.id%5;
-    //let setP1bRow= Math.floor(currentCell.id/5);
-    //let setP1bCol= currentCell.id%5;
-    
-    currentCell.innerHTML = cellText;
-    console.log(" Dette er for objektett col: "+setP1aCol+ " row: " + setP1aRow );
-    if(currentCell.innerHTML==="P1-0"){
-        
-        p1a.posrow=setP1aRow;
-        p1a.poscol=setP1aCol;
-        console.log (" in start p1a: row "+p1a.posrow +" collum: "+ p1a.poscol);
-    }
-    if(currentCell.innerHTML=== "P1-1"){
-        p1b.posrow=setP1aRow;
-        p1b.poscol=setP1aCol;
-        console.log (" in start p1b: row "+p1b.posrow +" collum: "+ p1b.poscol);
-    }
-}
+
