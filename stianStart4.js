@@ -34,6 +34,7 @@ let previousCell;
 
 let selectedPawn; 
 let isBuilding = false;
+let isMoved=false;
 function switchTurns(){
     if(!isBuilding){
         isItPlayer1Turn = !isItPlayer1Turn;
@@ -62,7 +63,7 @@ const tbody = document.querySelector('#SantoTable tbody');
 tbody.addEventListener('click', function (e){
   const cell = e.target.closest('td');
   currentCell = cell;
-  console.log (" isPlayer1 " + isItPlayer1Turn+" isBuilding " + isBuilding +" isPawnSelected "+ isPawnSelected);
+  //console.log (" isPlayer1 " + isItPlayer1Turn+" isBuilding " + isBuilding +" isPawnSelected "+ isPawnSelected);
   if (!cell) {
     return;
     }
@@ -80,8 +81,6 @@ tbody.addEventListener('click', function (e){
         let currentRow = Math.floor(currentCell.id/5);
         let currentColl = currentCell.id%5;
         
-        console.log(" This IS PREVIOUS CELL id coll:" + standingCell.id%5 + " , row: " + Math.floor(standingCell.id/5));
-        console.log(" This IS current CELL id coll:" + cell.id%5 + " , row: " + Math.floor(cell.id/5));
         building(currentRow,currentColl);
         
         updatePlayingBoard(selectedPawn);
@@ -98,7 +97,8 @@ tbody.addEventListener('click', function (e){
         
         previousCell = currentCell;
         selectedPawn = cell.innerHTML;
-        selectPawns(selectedPawn);
+        if(isBuilding===false){
+        selectPawns(selectedPawn);}
         
         }
         else{
@@ -116,13 +116,24 @@ tbody.addEventListener('click', function (e){
        
         previousCell = currentCell;
         selectedPawn = cell.innerHTML;
-        selectPawns(selectedPawn);
+        if(isBuilding===false){
+        selectPawns(selectedPawn);}
         
         }
         else{
             infoText.innerHTML = "Wrong pawn my guy!";
         }
 
+    }else if((cell.innerHTML).includes("P1")){
+        if(isItPlayer1Turn && !deploymentphase && isPawnSelected){
+        previousCell = currentCell;
+        selectedPawn = cell.innerHTML;
+        selectPawns(selectedPawn);}
+    }else if((cell.innerHTML).includes("P2")){
+        if( !isItPlayer1Turn && !deploymentphase && isPawnSelected){
+        previousCell = currentCell;
+        selectedPawn = cell.innerHTML;
+        selectPawns(selectedPawn);}
     }
 
     else if(isPawnSelected && cell.innerHTML === ""){
