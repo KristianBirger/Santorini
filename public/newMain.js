@@ -1,5 +1,8 @@
 let htmlTable = document.getElementById("SantoTable");
 let infoText = document.getElementById("infoText");
+let inputChat = document.getElementById("inputChat");
+let btnChat = document.getElementById("btnSend");
+let chatContainer = document.getElementById("chatContainer");
 
 let p1a = {
     poscol:0,
@@ -85,9 +88,6 @@ tbody.addEventListener('click', function (e){
         previousCol = cell.id%5;
         selectedPawn = cell.innerHTML;
         selectPawns(selectedPawn);
-
-
-       
      
         }
 
@@ -108,8 +108,6 @@ tbody.addEventListener('click', function (e){
         selectedPawn = cell.innerHTML;
         selectPawns(selectedPawn);
 
-
-        
         }
 
         else{
@@ -127,6 +125,8 @@ tbody.addEventListener('click', function (e){
 
       
     }
+
+  
     
 });
 
@@ -286,4 +286,81 @@ function inRange(old,newer){
     let min = old-1;
     return ((newer-min)*(newer-max)<=0);
 
+}
+
+//-------------------------------------------------------------------
+
+btnChat.addEventListener("click", sendMessage);
+
+function sendMessage (){
+
+    console.log("sending message");
+    sendRequest();
+    getMessages();
+
+}
+
+async function sendRequest(){
+
+    let url = "/msgs";
+
+let updata = {
+    id: "Carlson",
+    msg: inputChat.value
+}
+
+let cfg = {
+    method: "POST",
+    headers: {"Content-type":"application/json"},
+    body: JSON.stringify(updata)
+}
+
+try {
+    let response = await fetch(url, cfg);
+    let data = await response.json();
+    console.log("The data :" + data);
+
+    if (response.status != 200) {
+        throw data.error;
+    }
+}
+
+catch(error) {
+    console.log("something went wrong!")
+    console.log(error);
+}
+
+}
+
+
+
+async function getMessages(){
+    let url = "/msgs";
+    chatContainer.innerHTML = "";
+
+    try{
+        let response = await fetch (url);
+        let data = await response.json();
+
+        if (response.status != 200) {
+            throw data.error;
+        }
+      
+        for (let value of data) {
+            
+            //let data = new Date(value.time);
+
+            let html = "<h3>" + value.heading + "</h3>";
+            html += "<p>" + value.msgbody + "</p>";
+            
+            let myDiv = document.createElement("div");
+            myDiv.innerHTML = html;
+            chatContainer.appendChild(myDiv);
+            
+        }
+        
+    }
+    catch(error) {
+        console.log(error);
+    }
 }
