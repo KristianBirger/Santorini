@@ -296,7 +296,7 @@ function sendMessage (){
 
     console.log("sending message");
     sendRequest();
-    getMessages();
+    
 
 }
 
@@ -318,7 +318,7 @@ let cfg = {
 try {
     let response = await fetch(url, cfg);
     let data = await response.json();
-    console.log("The data :" + data);
+    getMessages();
 
     if (response.status != 200) {
         throw data.error;
@@ -337,6 +337,7 @@ catch(error) {
 async function getMessages(){
     let url = "/msgs";
     chatContainer.innerHTML = "";
+    
 
     try{
         let response = await fetch (url);
@@ -345,8 +346,10 @@ async function getMessages(){
         if (response.status != 200) {
             throw data.error;
         }
-      
-        for (let value of data) {
+
+        let dataReversed = data.reverse();
+
+        for (let value of dataReversed) {
             
             //let data = new Date(value.time);
 
@@ -355,6 +358,7 @@ async function getMessages(){
             
             let myDiv = document.createElement("div");
             myDiv.innerHTML = html;
+            
             chatContainer.appendChild(myDiv);
             
         }
