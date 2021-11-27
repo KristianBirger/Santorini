@@ -28,6 +28,8 @@ let isItPlayer1Turn = true;
 
 let isPawnSelected = false;
 
+let winnerState = false;
+
 let currentCell;
 let previousCell;
 
@@ -67,6 +69,8 @@ tbody.addEventListener('click', function (e){
   if (!cell) {
     return;
     }
+    
+
     //Player 1 deploy
     if(deploymentphase && isItPlayer1Turn && cell.innerHTML === "" && deployCount < 2){
 
@@ -97,8 +101,13 @@ tbody.addEventListener('click', function (e){
         
         previousCell = currentCell;
         selectedPawn = cell.innerHTML;
+
         if(isBuilding===false){
         selectPawns(selectedPawn);}
+        if(mapArr[Math.floor(currentCell.id/5)][currentCell.id%5]>2){
+            let player = isItPlayer1Turn;
+            return winnerCalculator(player);
+        }
         
         }
         else{
@@ -118,7 +127,11 @@ tbody.addEventListener('click', function (e){
         selectedPawn = cell.innerHTML;
         if(isBuilding===false){
         selectPawns(selectedPawn);}
-        
+        //console.log(" winner? " + mapArr[Math.floor(currentCell.id/5)][currentCell.id%5]);
+        if(mapArr[Math.floor(currentCell.id/5)][currentCell.id%5]>2){
+            let player = isItPlayer1Turn;
+            return winnerCalculator(player);
+        }
         }
         else{
             infoText.innerHTML = "Wrong pawn my guy!";
@@ -268,6 +281,10 @@ function updatePlayingBoard(cellText){
         previousCell.innerHTML = "";
         isPawnSelected = false;
         isBuilding = true;
+        if(mapArr[Math.floor(currentCell.id/5)][currentCell.id%5]>2){
+            let player = isItPlayer1Turn;
+            return winnerCalculator(player);
+        }
         switchTurns();
 
         }else{ 
@@ -293,6 +310,14 @@ function updatePlayingBoard(cellText){
 
     
 }
+function winnerCalculator(winName){
+    let winnerName;
+    if(winName)winnerName=" Player 1 ";
+    if(!winName)winnerName=" Player 2";
+    let winnerText= document.getElementById("jimbo");
+    winnerText.innerHTML = " Du want! " + winnerName;
+    console.log(" Du want! " + winnerName);
+}
 function whereIstand(oldPos,newPos){
     let newPosRow,newPosCol, oldPosRow,oldPosCol;
     
@@ -310,7 +335,7 @@ function whereIstand(oldPos,newPos){
     else if(inRange(oldPosCol, newPosCol) && inRange(oldPosRow, newPosRow) && inRange(mapArr[oldPosRow][oldPosCol], mapArr[newPosRow][newPosCol]) && inRange(mapArr[newPosRow][newPosCol], mapArr[oldPosRow][oldPosCol])){
       
         return true;
-    }else if(inRange(oldPosCol, newPosCol) && inRange(oldPosRow, newPosRow) && mapArr[oldPosRow][oldPosCol]>0 && isBuilding){
+    }else if(inRange(oldPosCol, newPosCol) && inRange(oldPosRow, newPosRow)  && isBuilding){
         
         return true;
     }else{
