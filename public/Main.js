@@ -392,7 +392,7 @@ function inRange(old,newer){
     }
 }
 
-//-------------------------------------------------------------------
+//------------------------------------------------------------------- 
 
 btnChat.addEventListener("click", sendMessage);
 
@@ -400,7 +400,7 @@ function sendMessage (){
 
     console.log("sending message");
     sendRequest();
-    
+    inputChat.value = "";
 
 }
 
