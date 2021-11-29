@@ -7,7 +7,7 @@ const router = express.Router();
 
 
 router.post("/users/login", async function(req, res, next){
-
+    const rowN = 0;
     let userLoginInfo = req.body;
 
     let userInputPassword = userLoginInfo.password;
@@ -17,25 +17,28 @@ router.post("/users/login", async function(req, res, next){
 
     try {
         
-        let usernameFromDB = await db.getUser(userInputName);
+        let UserInfoFromDB = await db.getUser(userInputName);
         
-        if(usernameFromDB.rows[0].username === userInputName){
+        if(UserInfoFromDB.rows[rowN].username === userInputName){
 
-            let verifyPass = utils.verifyPassword(userInputPassword, usernameFromDB.rows[0].password, usernameFromDB.rows[0].salt);
-            
-            console.log(verifyPass);
+            let verifyPass = utils.verifyPassword(userInputPassword, 
+                                                UserInfoFromDB.rows[rowN].password, 
+                                                UserInfoFromDB.rows[rowN].salt);
+            if(verifyPass){
+                res.status(200).json({msg: "Matching passwords!",
+                                      verified: verifyPass}).end();
 
+            }
+            else{
+                res.status(401).json({error: "Wrong password! This machine will now selfdestruct!"}).end();
+                return;
+            }    
+        
         }
-        
-    
 
     } catch (error) {   
         console.log(error);
     }
-
- //   let verifyPass = utils.verifyPassword(userInputPassword,  )
-
-
 })
 
 //Create User -----------

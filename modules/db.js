@@ -33,14 +33,4 @@ dbMethods.deleteUsers = function(id) {
     return pool.query(sql, values);
 }
 
-dbMethods.getGameArray = function(id) {
-
-    let sql = "SELECT * FROM mapinfo WHERE userid = $1";
-
-    let values = ["jon"];
-
-    return pool.query(sql, values);
-
-}
-
 module.exports = dbMethods;

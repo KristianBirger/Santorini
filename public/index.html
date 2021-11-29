@@ -52,15 +52,12 @@ try {
     let response = await fetch(url, cfg);
     let data = await response.json();
     
-    if(data = true){
+    if(data.verified){
         console.log("Password was correct");
+        location.href = "lobby.html";
     }
     else{
-        console.log("Wrong password!");
-    }
-
-    if (response.status != 200) {
-        throw data.error;
+        console.log(data.error);
     }
 }
 

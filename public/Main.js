@@ -4,7 +4,6 @@ let inputChat = document.getElementById("inputChat");
 let btnChat = document.getElementById("btnSend");
 let chatContainer = document.getElementById("chatContainer");
 
-
 let standingCell;
 //let p1a = {};
 //let p1b = {};
