@@ -8,13 +8,18 @@ const pool = new pg.Pool({
 	ssl: { rejectUnauthorized: false }
 });
 
+const users = require("./routes/users");
 
 const server = express();
 const PORT = process.env.PORT || 8080;
 
 server.set("port", PORT);
-server.use(express.static("public"));
 server.use(express.json());
+
+
+server.use(express.static("public"));
+server.use(users);
+
 
 
 

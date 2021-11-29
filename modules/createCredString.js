@@ -1,5 +1,5 @@
 
-function createCredString(username, password){
+/*function createCredString(username, password){
 
     let combinedStr = username + ":" + password;
     let b64Str = Buffer.from(combinedStr).toString("base64"); 
@@ -9,4 +9,4 @@ function createCredString(username, password){
 
 
 
-module.exports = createCredString;
+module.exports = createCredString; */

@@ -4,6 +4,7 @@ let inputChat = document.getElementById("inputChat");
 let btnChat = document.getElementById("btnSend");
 let chatContainer = document.getElementById("chatContainer");
 
+
 let standingCell;
 //let p1a = {};
 //let p1b = {};
@@ -459,13 +460,13 @@ async function getMessages(){
             throw data.error;
         }
 
+
         
         let dataReversed = data.reverse();
         dataReversed = data.slice(0,messageLength);
 
         for (let value of dataReversed) {
             
-
             let html = "<h3>" + value.heading + "</h3>";
             html += "<p>" + value.msgbody + "</p>";
             

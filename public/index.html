@@ -22,18 +22,55 @@
 <button id="btnCreateU">Create user</button>
 <script>
 
-
-
 let btnLogin = document.getElementById("btnLogin");
 let inpUsername = document.getElementById("inpUsername");
 let inpPassword = document.getElementById("inpPassword");
-let createUsername = document.getElementById("createUsername");
-let createPassword = document.getElementById("createPassword");
+let inpCreateUsername = document.getElementById("createUsername");
+let inpCreatePassword = document.getElementById("createPassword");
 let btnCreateU = document.getElementById("btnCreateU");
 
-btnLogin.addEventListener("click", function(){
+btnLogin.addEventListener("click",async function(){
 
-    location.href = "game.html"
+    console.log("clicked");
+
+    let url = "/users/login";
+
+    let updata = {
+
+        username : inpUsername.value,
+        password : inpPassword.value
+    }
+
+    let cfg = {    
+
+    method: "POST",
+    headers: {"Content-type":"application/json"},
+    body: JSON.stringify(updata)
+}
+
+try {
+    let response = await fetch(url, cfg);
+    let data = await response.json();
+    
+    if(data = true){
+        console.log("Password was correct");
+    }
+    else{
+        console.log("Wrong password!");
+    }
+
+    if (response.status != 200) {
+        throw data.error;
+    }
+}
+
+catch(error) {
+    console.log("something went wrong!")
+    console.log(error);
+}
+
+
+  //  location.href = "game.html"
 
 });
 
@@ -41,17 +78,14 @@ btnCreateU.addEventListener("click", sendCreateUser);
 
 async function sendCreateUser(){
 
-let url = "/createUser";
+let url = "/users";
+let credString = createCredString(inpCreateUsername.value, inpCreatePassword.value);
 
-let updata = {
-    username: createUsername.value,
-    password: createPassword.value
-}
+console.log(credString);
 
 let cfg = {
     method: "POST",
-    headers: {"Content-type":"application/json"},
-    body: JSON.stringify(updata)
+    headers: {"authorization": credString}
 }
 
 try {
@@ -71,6 +105,16 @@ catch(error) {
 
 
 }
+
+function createCredString(username, password){
+
+let combinedStr = username + ":" + password;
+//let b64Str = Buffer.from(combinedStr).toString("base64"); 
+let b64Str = btoa(combinedStr); 
+
+return `basic ${b64Str}`;
+}
+
 
 </script>
 
