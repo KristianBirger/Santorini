@@ -15,22 +15,60 @@
 
 <button id="btnLogin">Login</button>
 
+<h3>Create new user</h3>
+
+<input type="text" id="createUsername" placeholder="Username">
+<input type="text" id="createPassword" placeholder="Password">
+<button id="btnCreateU">Create user</button>
 <script>
 
-const createCreds = require("../modules/createCredString");
+
 
 let btnLogin = document.getElementById("btnLogin");
-
-
+let inpUsername = document.getElementById("inpUsername");
+let inpPassword = document.getElementById("inpPassword");
+let createUsername = document.getElementById("createUsername");
+let createPassword = document.getElementById("createPassword");
+let btnCreateU = document.getElementById("btnCreateU");
 
 btnLogin.addEventListener("click", function(){
-    
-    console.log(createCreds("test","test"));
-    
-   // location.href = "game.html";
+
+    location.href = "game.html"
+
 });
 
-async function sendRequest(){
+btnCreateU.addEventListener("click", sendCreateUser);
+
+async function sendCreateUser(){
+
+let url = "/createUser";
+
+let updata = {
+    username: createUsername.value,
+    password: createPassword.value
+}
+
+let cfg = {
+    method: "POST",
+    headers: {"Content-type":"application/json"},
+    body: JSON.stringify(updata)
+}
+
+try {
+    let response = await fetch(url, cfg);
+    let data = await response.json();
+    
+
+    if (response.status != 200) {
+        throw data.error;
+    }
+}
+
+catch(error) {
+    console.log("something went wrong!")
+    console.log(error);
+}
+
 
 }
 

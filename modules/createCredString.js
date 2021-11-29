@@ -7,8 +7,6 @@ function createCredString(username, password){
     return `basic ${b64Str}`;
 }
 
-let cred = createCredString("stian", "passord"); //basic c3RpYW46cGFzc29yZA==
-console.log(cred);
 
 
 module.exports = createCredString;

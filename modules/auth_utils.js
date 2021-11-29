@@ -1,4 +1,4 @@
-//const crypto = require("crypto");
+const crypto = require("crypto");
 
 const secret = "TheFreshPrinceofBelAir";
 
@@ -21,4 +21,17 @@ utils.decodeCred = function(credString) {
 };  
 
 console.log(utils.decodeCred("basic c3RpYW46cGFzc29yZA=="));
+
+utils.createHash = function(password){
+
+    let hash = {}
+
+   //hash.salt = Math.random.toString();
+    hash.salt = secret;
+    hash.value = crypto.scryptSync(password, hash.salt, 64).toString("hex");
+    
+    return hash
+};
+
+console.log(utils.createHash("passord"));
 
