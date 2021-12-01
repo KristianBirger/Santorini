@@ -58,9 +58,7 @@ function switchTurns(){
         isItPlayer1Turn = !isItPlayer1Turn;
         // sendArr(); dette er en post
        
-        console.log("sendArr er: ");
-        console.log();
-        getArr();
+        
         
     /*
     */
@@ -107,7 +105,7 @@ tbody.addEventListener('click', function (e){
 
         deployPlayers(cell.id);
 
-    }else if(isBuilding && !isPawnSelected && cell.innerHTML === ""&& whereIstand(standingCell,currentCell) ){
+    }else if(isBuilding && !isPawnSelected && cell.innerHTML === "" && whereIstand(standingCell,currentCell) ){
         let currentRow = Math.floor(currentCell.id/5);
         let currentColl = currentCell.id%5;
         
@@ -164,27 +162,31 @@ tbody.addEventListener('click', function (e){
         }
 
     }else if((cell.innerHTML).includes("P1")){
-        if(isItPlayer1Turn && !deploymentphase && isPawnSelected){
+        if(isItPlayer1Turn && !deploymentphase && isPawnSelected ){
         previousCell = currentCell;
         selectedPawn = cell.innerHTML;
         selectPawns(selectedPawn);}
     }else if((cell.innerHTML).includes("P2")){
-        if( !isItPlayer1Turn && !deploymentphase && isPawnSelected){
+        if( !isItPlayer1Turn && !deploymentphase && isPawnSelected ){
         previousCell = currentCell;
         selectedPawn = cell.innerHTML;
         selectPawns(selectedPawn);}
     }
 
-    else if(isPawnSelected && cell.innerHTML === ""){
-
+    else if(isPawnSelected && cell.innerHTML === "" ){
+       // previousCell = currentCell;
+        if(whereIstand(previousCell,currentCell)){
         updatePlayingBoard(selectedPawn);
         updateArr(cell.id, selectedPawn);
         findPlayerPosInArr(selectedPawn, previousCell.id);
         printPlayerArray();
+        }
 
     }
     //updateDbArr();
     updateDbArr();
+    getArr();
+    arrChangeToDb();
 });
 
 function findPlayerPosInArr(selected, cellId){  
@@ -307,10 +309,10 @@ function updatePlayingBoard(cellText){
     }
 
     else if(isPawnSelected){
-        
+        standingCell=currentCell;
         if( whereIstand( previousCell, currentCell)){
         //currentCell.innerHTML = cellText;
-        standingCell=currentCell;
+        
         //previousCell.innerHTML = "";
         isPawnSelected = false;
         isBuilding = true;
@@ -327,7 +329,7 @@ function updatePlayingBoard(cellText){
          }
     }else if(isBuilding){
     
-        if(whereIstand(previousCell,currentCell)){
+        if(whereIstand(previousCell,currentCell, null)){
             //console.log(mapArr);
             isBuilding=false;
             switchTurns();
@@ -356,16 +358,25 @@ function winnerCalculator(winName){
     winnerText.innerHTML = " Du want! " + winnerName;
     console.log(" Du want! " + winnerName);
 }
-function whereIstand(oldPos,newPos){
+function whereIstand(oldPos,newPos, currentPos){
     let newPosRow,newPosCol, oldPosRow,oldPosCol;
     
 
     newPosRow=Math.floor(Math.floor(newPos.id/5));
     newPosCol=newPos.id%5;
+    if(currentPos === undefined && oldPos === undefined ){
 
-    oldPosRow=Math.floor(Math.floor(oldPos.id/5));
+    }
+    else if(oldPos === undefined){
+        oldPosRow=Math.floor(Math.floor(currentPos.id/5));
+        oldPosCol=currentPos.id%5;
+    }else{
+        oldPosRow=Math.floor(Math.floor(oldPos.id/5));
     oldPosCol=oldPos.id%5;
-
+    }
+    
+    updateDbArr();
+    getArr();
     if(oldPosCol===newPosCol && newPosCol === newPosRow && oldPosRow === newPosRow){
         
         return false;
@@ -457,7 +468,7 @@ async function getArr(){
     let pArrValue;
     let mArrValue;
 
-    for(value in data){
+    for(value of data){
         let player=data[value].playerarr;
         let map=data[value].maparr;
          pArrValue=player.replaceAll("\"","").replaceAll("{","").replaceAll("}","");
@@ -466,20 +477,26 @@ async function getArr(){
     }
     let splitMArr=mArrValue.split(",");
     let splitPArr = pArrValue.split(",");
-    console.log("split arr: ");
+    console.log("split mar: ");
     console.log(splitMArr);
+    console.log("split par: ");
+    console.log(splitPArr);
     
     for (let i=0;  i < splitPArr.length; i++){
         if(innerPlayerArr.length<5){
             if(splitPArr[i]==="0"||splitPArr[i]===0 ){
                 innerPlayerArr.push(0);
             }else if(splitPArr[i]==="P1-0"){
+                console.log(" sjer dette dårlig tid? p1");
                 innerPlayerArr.push("P1-0");
             }else if(splitPArr[i]==="P1-1"){
+                console.log(" sjer dette dårlig tid? p11");
                 innerPlayerArr.push("P1-1");
             }else if(splitPArr[i]==="P2-0"){
+                console.log(" sjer dette dårlig tid? p2");
                 innerPlayerArr.push("P2-0");
             }else if(splitPArr[i]==="P2-1"){
+                console.log(" sjer dette dårlig tid? p22");
                 innerPlayerArr.push("P2-1");
             }else{
                 console.log(" PlayerArr index got gliched " + splitPArr[i])}
@@ -555,6 +572,24 @@ async function getArr(){
     //mapArr=resMapArr;
      // dette refresher canvasen med ny verdier
 
+     playerposArr = [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+    ]; 
+    // Må ha to, enten må kun playeren stå i arrayen eller hva nivå bygningen er på 
+    mapArr = [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+    ];
+
+
+    
    }catch(err){
         console.log(" URL could not be fetcherd " + err);
     }
@@ -589,6 +624,7 @@ async function updateDbArr(){
         console.log("something went wrong!")
         console.log(error);
     }
+
 }
 
 async function sendPlayerArr(){
@@ -689,14 +725,7 @@ async function getMessages(){
         console.log(error);
     }
 }
-/*
-    if(previusPlayerPos[0]!==undefined){
-        playerposArr=previusPlayerPos;
-        mapArr=previusMapPos;
-    }   else{
-        console.log(" Vi hentet ikke fra databasen ")
-    }
-    */
+
 
 
 function printPlayerArray(){
@@ -758,4 +787,14 @@ function printPlayerArray(){
     }
 
 
+}
+function arrChangeToDb(){
+
+    if(previusPlayerPos[0]!==undefined && previusMapPos[0]!==undefined){
+        playerposArr=previusPlayerPos;
+        mapArr=previusMapPos;
+    }   else{
+        console.log(" Vi hentet ikke fra databasen ")
+    }
+    
 }
