@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h1>Santorini Lobby</h1>
+    <button id="playGame">Play Santorini!</button>
+    <button id="showGames">Show games</button>
+    
+    <h3 id="userInfo"></h3>
+    <button id="myUser">My user</button>
+
+<script>
+let btn = document.getElementById("playGame");
+let btnShow = document.getElementById("showGames");
+let btnmyUser = document.getElementById("myUser");
+let userInfo = document.getElementById("userInfo");
+
+updateUserInfo();
+
+btn.addEventListener("click", function(){
+    location.href = "game.html";
+})
+
+btnShow.addEventListener("click", loadGames)
+   
+btnmyUser.addEventListener("click", myUser = function(){
+
+    location.href = "myUser.html";
+    
+})
+
+
+
+
+function updateUserInfo (){
+
+    let username = localStorage.getItem("username")
+
+    userInfo.innerHTML = `You are logged inn as ${username}`;
+
+}
+
+async function loadGames(){
+
+        let token = localStorage.getItem("token");
+    let url = "/activeGames";
+
+    let cfg = {
+        method: "GET",
+        headers: {"authorization": token}
+    };
+
+    try {
+        
+        let response = await fetch(url, cfg);
+        let data = await response.json();
+
+        if (response.status != 200) {
+
+            console.log(data.error);
+
+        }
+
+
+        console.log("The data " + data[0].username);
+        
+
+    } catch (error) {
+        console.log(error);
+    }
+
+    
+    }
+
+</script>
+    
+</body>
+
+</html>

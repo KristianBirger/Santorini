@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h1 id="myUser">Hello user!</h1>
+
+    <h3>Delete me!</h3>
+    <button id="deleteThisUser">Delete me now!</button>
+    
+<script>
+
+
+let myHeading = document.getElementById("myUser");
+let btnDeleteUser = document.getElementById("deleteThisUser");
+
+
+myUsername = localStorage.getItem("username");
+
+
+verifyToken();
+updateUserInfo();
+
+btnDeleteUser.addEventListener("click",deleteThisUser)
+
+function updateUserInfo(){
+
+    myHeading.innerHTML = `Hello ${myUsername}`
+}
+
+async function deleteThisUser(){
+
+    let myId = localStorage.getItem("id");
+    let myToken = localStorage.getItem("token");
+    console.log(`Deleting the user with id ${myId}`);
+
+
+    let url = "/user";
+
+    let cfg = {    
+
+    method: "DELETE",
+    headers: {"authorization": myToken,
+                 "id": myId 
+                                        }
+}
+
+try {
+    let response = await fetch(url, cfg);
+    let data = await response.json();
+
+    console.log(data);
+
+    if(data.status = 200){
+
+        console.log(data.msg);
+        alert(`The user: ${myUsername}, was deleted`);
+        localStorage.clear();
+        location.href = "index.html";
+        
+    }
+    else{
+        console.log(data.error);
+    }
+}
+
+catch(error) {
+    console.log("Failed to delete user!")
+    console.log(error);
+}
+}
+
+async function verifyToken(){
+
+    let myId = localStorage.getItem("id");
+    let myToken = localStorage.getItem("token");
+    
+
+    let url = "/verify";
+
+    let cfg = {    
+
+    method: "POST",
+    headers: {"authorization": myToken,
+              "id": myId 
+                }
+}
+
+try {
+    let response = await fetch(url, cfg);
+    let data = await response.json();
+
+    console.log(data);
+
+    if(data.response != 200){
+        console.log("You are not welcome");
+    }
+    else {
+        console.log("Token verification ok");
+    }
+}
+
+catch(error) {
+    console.log(error);
+}
+}
+
+
+
+
+
+
+</script>
+</body>
+</html>

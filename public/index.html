@@ -20,6 +20,9 @@
 <input type="text" id="createUsername" placeholder="Username">
 <input type="text" id="createPassword" placeholder="Password">
 <button id="btnCreateU">Create user</button>
+
+<h3 id="info"></h3>
+
 <script>
 
 let btnLogin = document.getElementById("btnLogin");
@@ -28,6 +31,8 @@ let inpPassword = document.getElementById("inpPassword");
 let inpCreateUsername = document.getElementById("createUsername");
 let inpCreatePassword = document.getElementById("createPassword");
 let btnCreateU = document.getElementById("btnCreateU");
+let infotext = document.getElementById("info");
+
 
 btnLogin.addEventListener("click",async function(){
 
@@ -37,8 +42,8 @@ btnLogin.addEventListener("click",async function(){
 
     let updata = {
 
-        username : inpUsername.value,
-        password : inpPassword.value
+        username : inpUsername.value.trim(),
+        password : inpPassword.value.trim()
     }
 
     let cfg = {    
@@ -51,13 +56,18 @@ btnLogin.addEventListener("click",async function(){
 try {
     let response = await fetch(url, cfg);
     let data = await response.json();
-    
+
     if(data.verified){
         console.log("Password was correct");
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.username);
+        localStorage.setItem("id", data.id);
+        console.log(data.id);
         location.href = "lobby.html";
     }
     else{
         console.log(data.error);
+        showFeedBack(data.error);
     }
 }
 
@@ -78,7 +88,7 @@ async function sendCreateUser(){
 let url = "/users";
 let credString = createCredString(inpCreateUsername.value, inpCreatePassword.value);
 
-console.log(credString);
+
 
 let cfg = {
     method: "POST",
@@ -91,7 +101,13 @@ try {
     
 
     if (response.status != 200) {
-        throw data.error;
+        console.log(data.error);
+        showFeedBack(data.error);
+    }
+    else {
+
+        showFeedBack(`User: ${inpCreateUsername.value} was sucessfully created`);
+
     }
 }
 
@@ -110,6 +126,10 @@ let combinedStr = username + ":" + password;
 let b64Str = btoa(combinedStr); 
 
 return `basic ${b64Str}`;
+}
+
+function showFeedBack (errortext){
+    infotext.innerHTML = errortext;
 }
 
 

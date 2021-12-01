@@ -1,6 +1,6 @@
 const pg = require("pg");
 
-const dbURI = "postgres://zobaiucetmzsxq:6366801118e3ce48534db24f94ebd974ae276ed26ff7e818617b16cd2de188e8@ec2-52-213-119-221.eu-west-1.compute.amazonaws.com:5432/d1deqogq380er5";
+const dbURI = "postgres://pvmasarbwjcapq:b9ac1bd34cdfea58b154863227e304c846d5022315f78131578fff5316cc30d8@ec2-34-246-155-237.eu-west-1.compute.amazonaws.com:5432/d1d2ak6c1p140m";
 const connstring = process.env.DATABASE_URL || dbURI;
 const pool = new pg.Pool({
 	connectionString: connstring,
@@ -27,10 +27,15 @@ dbMethods.createUsers = function(username, password, salt){
     return pool.query(sql, values);
 }
 
+dbMethods.updateUser = function(username){
+
+}
+
 dbMethods.deleteUsers = function(id) {
     let sql = "DELETE FROM users WHERE id = $1 RETURNING *";
     let values = [id];
     return pool.query(sql, values);
 }
+
 
 module.exports = dbMethods;

@@ -1,7 +1,7 @@
 const express = require("express");
 const pg = require("pg");
 const createCredentials = require("./modules/createCredString");
-const dbURI = "postgres://zobaiucetmzsxq:6366801118e3ce48534db24f94ebd974ae276ed26ff7e818617b16cd2de188e8@ec2-52-213-119-221.eu-west-1.compute.amazonaws.com:5432/d1deqogq380er5";
+const dbURI = "postgres://pvmasarbwjcapq:b9ac1bd34cdfea58b154863227e304c846d5022315f78131578fff5316cc30d8@ec2-34-246-155-237.eu-west-1.compute.amazonaws.com:5432/d1d2ak6c1p140m";
 const connstring = process.env.DATABASE_URL || dbURI;
 const pool = new pg.Pool({
 	connectionString: connstring,
@@ -21,8 +21,6 @@ server.use(express.static("public"));
 server.use(users);
 
 
-
-
 server.get("/msgs", async function(req, res, next){
 	let sql = "SELECT * FROM messages";
 	
@@ -34,17 +32,6 @@ server.get("/msgs", async function(req, res, next){
 	res.status(500).json({error: err}).end();
 	}
 });
-
-server.post("/createUser", async function (req, res, next) {
-    
-
-	let info = createCredentials(req.body.username, req.body.password);
-
-	console.log(info);
-
-	
-});
-
 
 server.post("/msgs", async function (req, res, next) {
     console.log(req.body.msg);
