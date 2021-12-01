@@ -10,33 +10,161 @@
 
     <h1 id="myUser">Hello user!</h1>
 
+    <h2>Change username</h2>
+    <input id="inpNewusername" placeholder="Input the new username">
+    <br><br>
+    <button id="btnNewUsername">Ok</button>
+
+    <h2>Change password</h2>
+    <input id="inpOldPassword" placeholder="Input the old password">
+    <br><br>
+    <input id="inpNewPassword" placeholder="Input the new password">
+    <br><br>
+    <input id="inpNewPasswordRepeat" placeholder="Repeat the new password">
+    <br><br>
+    <button id="btnNewpassword">Ok</button>
+
     <h3>Delete me!</h3>
     <button id="deleteThisUser">Delete me now!</button>
+
+    <h2 id="info">hello</h2>
     
 <script>
 
 
 let myHeading = document.getElementById("myUser");
 let btnDeleteUser = document.getElementById("deleteThisUser");
+let btnUpdateUsername = document.getElementById("btnNewUsername");
+let infoText = document.getElementById("info");
 
+let inpNewUsername = document.getElementById("inpNewusername");
+let inpOldPass = document.getElementById("inpOldPassword");
+let inpNewPassword = document.getElementById("inpNewPassword");
+let inpNewPasswordRepeat = document.getElementById("inpNewPasswordRepeat");
 
-myUsername = localStorage.getItem("username");
+let myUsername = localStorage.getItem("username");
+let myId = localStorage.getItem("id");
+let myToken = localStorage.getItem("token");
 
 
 verifyToken();
-updateUserInfo();
+myHeading.innerHTML = `Hello ${myUsername}`
 
+
+btnUpdateUsername.addEventListener("click", updateUsername);
 btnDeleteUser.addEventListener("click",deleteThisUser)
 
-function updateUserInfo(){
+async function updateUsername(){
 
-    myHeading.innerHTML = `Hello ${myUsername}`
+    let url ="/users/updateName";
+    
+    let update ={
+        id: myId,
+        oldUsername: myUsername,
+        newUsername: inpNewUsername.value
+    }
+
+    let cfg = {
+        method: "PUT",
+        headers: {"Content-type" : "application/json",
+                   "authorization": myToken              
+                 },
+        body: JSON.stringify(update)
+    }
+    try {
+        let response = await fetch(url, cfg);
+        let data = await response.json();
+
+
+        if (response.status != 200) {
+            throw data.error;
+            console.log(data.error);
+            infoText.innerHTML = data.error
+        }
+        else{
+
+            infoText.innerHTML = data.msg;
+            myHeading.innerHTML = `Hello ${data.newUsername}`
+
+        }
+
+        
+    }
+
+    catch(error) {
+        console.log("something went wrong!")
+        console.log(error);
+        infoText.innerHTML = error;
+    }
+}
+   
+async function updatePassword(){
+
+    //check old pass
+
+    let oldpass = inpOldPass.value;
+    let newPassword;
+
+    //matching new passwords
+
+    if(inpNewPassword.value === inpNewPasswordRepeat.value){
+
+    
+
+    }
+    else{
+
+        infoText.innerHTML = "Not matching passwords!";
+    }
+
+    //send new hash and salt
+
+    let url ="/users/updatePassword";
+
+    let update ={
+        id: myId,
+        username: myUsername,
+        oldPassword: oldpass,
+        newPassword: newPassword
+            }
+
+    let cfg = {
+        method: "PUT",
+        headers: {"Content-type" : "application/json",
+                   "authorization": myToken              
+                 },
+        body: JSON.stringify(update)
+    }
+    try {
+        let response = await fetch(url, cfg);
+        let data = await response.json();
+
+
+        if (response.status != 200) {
+            throw data.error;
+            console.log(data.error);
+            infoText.innerHTML = data.error
+        }
+        else{
+
+            infoText.innerHTML = data.msg;
+            myHeading.innerHTML = `Hello ${data.newUsername}`
+
+        }
+
+        
+    }
+
+    catch(error) {
+        console.log("something went wrong!")
+        console.log(error);
+        infoText.innerHTML = error;
+    }
+
 }
 
 async function deleteThisUser(){
 
-    let myId = localStorage.getItem("id");
-    let myToken = localStorage.getItem("token");
     console.log(`Deleting the user with id ${myId}`);
 
 
@@ -77,9 +205,6 @@ catch(error) {
 
 async function verifyToken(){
 
-    let myId = localStorage.getItem("id");
-    let myToken = localStorage.getItem("token");
-    
 
     let url = "/verify";
 

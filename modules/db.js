@@ -27,8 +27,20 @@ dbMethods.createUsers = function(username, password, salt){
     return pool.query(sql, values);
 }
 
-dbMethods.updateUser = function(username){
+dbMethods.updateUser = function(username, id){
 
+    let sql = "UPDATE users SET username = $1 WHERE id = $2";
+    let values = [username, id];
+    return pool.query(sql, values);
+        
+}
+
+dbMethods.updateUserPass = function(password, salt, id){
+
+    let sql = "UPDATE users SET username = $1 WHERE id = $2";
+    let values = [username, id];
+    return pool.query(sql, values);
+        
 }
 
 dbMethods.deleteUsers = function(id) {

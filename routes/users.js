@@ -97,9 +97,64 @@ router.post("/users", async function(req, res, next){
     }
 });
 
-router.get("/users", async function(req, res, next){
+router.put("/users/updateName", protect, async function(req, res, next){
 
+let update = req.body;
+console.log(update);
+
+try {
+    let data = await db.updateUser(update.newUsername, update.id);
+   
+    if (data.rowCount > 0) {
+
+        res.status(200).json({msg: `New username set to ${update.username}`,
+                              newUsername: update.newUsername}).end();
+
+        console.log("PUT request was created!");
+    }
+
+}
+catch(error) {
+
+    if (error.code = "23505"){
+        res.status(401).json({error: "Error - That username already exists!"}).end();
+    }
+
+    console.log("something went wrong at PUT " + error);
+   // res.status(500).json({error: error}).end();
+}
+
+
+});
+
+router.put("/users/updatePassword"), protect, async function(req,res,next){
+    const rowN = 0;
+    let update = req.body;
     
+    try {
+        
+    let UserInfoFromDB = await db.getUser(update.username);
+
+    let verifyPass = utils.verifyPassword(update.oldPassword, 
+        UserInfoFromDB.rows[rowN].password, 
+        UserInfoFromDB.rows[rowN].salt);
+        
+        
+        if(verifyPass){
+
+            //create new password
+            let hash = authUtils.createHash(update.newPassword);
+
+
+        }
+
+    } catch (error) {
+        
+    }
+
+}
+
+router.get("/users", async function(req, res, next){
 
     try {
         
