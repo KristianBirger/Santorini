@@ -1,3 +1,4 @@
+
 let htmlTable = document.getElementById("SantoTable");
 let infoText = document.getElementById("infoText");
 let inputChat = document.getElementById("inputChat");
@@ -23,7 +24,13 @@ let mapArr = [
     [0,0,0,0,0],
     [0,0,0,0,0]
 ];
+let previusPlayerPos=[];
+let previusMapPos=[];
 
+let pObjet={
+    player: playerposArr,
+    map: mapArr
+}
 let deploymentphase = true; 
 
 let isItPlayer1Turn = true;
@@ -39,6 +46,8 @@ let previousCell;
 let selectedPawn; 
 let isBuilding = false;
 let isMoved=false;
+
+sendArr();
 function switchTurns(){
     if(!isBuilding){
         isItPlayer1Turn = !isItPlayer1Turn;
@@ -91,15 +100,15 @@ tbody.addEventListener('click', function (e){
         
         updatePlayingBoard(selectedPawn);
         isBuilding=false;
-        console.log("mapArr: ");
-        console.log(mapArr);// for å se om mapet bygges
+        //console.log("mapArr: ");
+        //console.log(mapArr);// for å se om mapet bygges
     }
 
 
     else if (isItPlayer1Turn && !deploymentphase && !isPawnSelected){
         
         if((cell.innerHTML).includes("P1")){
-            console.log("uuuh" + (cell.innerHTML).includes("P1"));
+            //console.log("uuuh" + (cell.innerHTML).includes("P1"));
         
         previousCell = currentCell;
         selectedPawn = cell.innerHTML;
@@ -123,7 +132,7 @@ tbody.addEventListener('click', function (e){
     else if(!isItPlayer1Turn && !deploymentphase && !isPawnSelected){
         
         if((cell.innerHTML).includes("P2")){
-            console.log("uuuh" + (cell.innerHTML).includes("P2"));
+           // console.log("uuuh" + (cell.innerHTML).includes("P2"));
        
         previousCell = currentCell;
         selectedPawn = cell.innerHTML;
@@ -153,12 +162,17 @@ tbody.addEventListener('click', function (e){
 
     else if(isPawnSelected && cell.innerHTML === ""){
        
-        
-        updatePlayingBoard(selectedPawn);
-        updateArr(cell.id, selectedPawn);
-        findPlayerPosInArr(selectedPawn, previousCell.id);
+        if(whereIstand(previousCell,currentCell)){
+            updatePlayingBoard(selectedPawn);
+            updateArr(cell.id, selectedPawn);
+            findPlayerPosInArr(selectedPawn, previousCell.id);
+            printPlayerArray();
+            }
 
     }
+    updateDbArr();
+    getArr();
+    arrChangeToDb();
     
 });
 
@@ -272,15 +286,15 @@ function addToPlayerPosArr(cellId, cellText) {
 function updatePlayingBoard(cellText){
     
     if(deploymentphase){
-        currentCell.innerHTML = cellText;    
+       // currentCell.innerHTML = cellText;    
     }
 
     else if(isPawnSelected){
         
         if( whereIstand( previousCell, currentCell)){
-        currentCell.innerHTML = cellText;
+        //currentCell.innerHTML = cellText;
         standingCell=currentCell;
-        previousCell.innerHTML = "";
+        //previousCell.innerHTML = "";
         isPawnSelected = false;
         isBuilding = true;
         if(mapArr[Math.floor(currentCell.id/5)][currentCell.id%5]>2){
@@ -306,10 +320,10 @@ function updatePlayingBoard(cellText){
     }
     else{
     
-    currentCell.innerHTML = cellText;
+    //currentCell.innerHTML = cellText;
  //   lastCell.innerHTML = "";
     }
-
+    printPlayerArray();
     
 }
 function winnerCalculator(winName){
@@ -320,15 +334,26 @@ function winnerCalculator(winName){
     winnerText.innerHTML = " Du want! " + winnerName;
     console.log(" Du want! " + winnerName);
 }
-function whereIstand(oldPos,newPos){
+function whereIstand(oldPos,newPos, currentPos){
     let newPosRow,newPosCol, oldPosRow,oldPosCol;
     
 
     newPosRow=Math.floor(Math.floor(newPos.id/5));
     newPosCol=newPos.id%5;
+    if(currentPos === undefined && oldPos === undefined ){
 
-    oldPosRow=Math.floor(Math.floor(oldPos.id/5));
+    }
+    else if(oldPos === undefined){
+        oldPosRow=Math.floor(Math.floor(currentPos.id/5));
+        oldPosCol=currentPos.id%5;
+    }else{
+        oldPosRow=Math.floor(Math.floor(oldPos.id/5));
     oldPosCol=oldPos.id%5;
+    }
+   // oldPosRow=Math.floor(Math.floor(oldPos.id/5));
+    //oldPosCol=oldPos.id%5;
+    updateDbArr();
+    getArr();
 
     if(oldPosCol===newPosCol && newPosCol === newPosRow && oldPosRow === newPosRow){
         
@@ -348,29 +373,6 @@ function whereIstand(oldPos,newPos){
 function building(currentRow,currentColl){
     // dette påvirker koden og burde revurderess.
     console.log("sett building up by 1 ");
-    let fargelegging=document.getElementById(currentCell.id);
-    //let tableHtml=document.getElementById("SantoTable");
-    let switchChecker=mapArr[currentRow][currentColl];
-    console.log("Switch checker value? "+ switchChecker);
-    switch(switchChecker){
-        
-        case 0:
-            fargelegging.classList.add("tier1");
-            break;
-        case 1:
-           
-            fargelegging.classList.add("tier2");
-           // fargelegging.classList.remove("tier1");
-            break;
-        case 2:
-            //fargelegging.classList.remove("tier2");
-            fargelegging.classList.add("tier3");
-            break;
-        case 3:
-            //fargelegging.classList.remove("tier3");
-            fargelegging.classList.add("tier4");
-            break;
-    }
     
     
 
@@ -392,10 +394,15 @@ function inRange(old,newer){
     }
 }
 
-//------------------------------------------------------------------- 
+//------------------------------------------------------------------- Chat
 
-btnChat.addEventListener("click", sendMessage);
+btnChat.addEventListener("click", sendMessage); 
 
+function sendArr(){  // sender playerArr når klikker på grafen.
+    console.log(" sending player array ");
+    sendPlayerArr();
+    
+}
 function sendMessage (){
 
     console.log("sending message");
@@ -409,6 +416,213 @@ let myInterval;
 if(!myInterval){
 
     myInterval = setInterval(getMessages, 2000);
+}
+
+async function getArr(){
+    let url = "/api/parr";
+    let innerPlayerArr=[];
+    let resPlayerArr=[];
+    let innerMapArr=[];
+    let resMapArr=[];
+
+    try{
+    let getArr = await fetch(url);
+   
+    let data = await getArr.json();
+
+    
+    //console.log(data);
+    //console.log("Player " + data[0].playerarr);// data av array index tror jeg
+    //console.log("Map "+data[0].maparr);
+    let pArrValue;
+    let mArrValue;
+
+    for(value of data){
+        let player=data[value].playerarr;
+        let map=data[value].maparr;
+         pArrValue=player.replaceAll("\"","").replaceAll("{","").replaceAll("}","");
+         mArrValue=map.replaceAll("}","").replaceAll("{","").replaceAll("\"","");
+
+    }
+    let splitMArr=mArrValue.split(",");
+    let splitPArr = pArrValue.split(",");
+    console.log("split mar: ");
+    console.log(splitMArr);
+    console.log("split par: ");
+    console.log(splitPArr);
+    
+    for (let i=0;  i < splitPArr.length; i++){
+        if(innerPlayerArr.length<5){
+            if(splitPArr[i]==="0"||splitPArr[i]===0 ){
+                innerPlayerArr.push(0);
+            }else if(splitPArr[i]==="P1-0"){
+                console.log(" sjer dette dårlig tid? p1");
+                innerPlayerArr.push("P1-0");
+            }else if(splitPArr[i]==="P1-1"){
+                console.log(" sjer dette dårlig tid? p11");
+                innerPlayerArr.push("P1-1");
+            }else if(splitPArr[i]==="P2-0"){
+                console.log(" sjer dette dårlig tid? p2");
+                innerPlayerArr.push("P2-0");
+            }else if(splitPArr[i]==="P2-1"){
+                console.log(" sjer dette dårlig tid? p22");
+                innerPlayerArr.push("P2-1");
+            }else{
+                console.log(" PlayerArr index got gliched " + splitPArr[i])}
+            if(i===24){
+                    resPlayerArr.push(innerPlayerArr);
+            } 
+         }else{
+            resPlayerArr.push(innerPlayerArr);
+            innerPlayerArr=[];
+            if(splitPArr[i]==="0"||splitPArr[i]===0 ){
+                innerPlayerArr.push(0);
+            }else if(splitPArr[i]==="P1-0"){
+                innerPlayerArr.push("P1-0");
+            }else if(splitPArr[i]==="P1-1"){
+                innerPlayerArr.push("P1-1");
+            }else if(splitPArr[i]==="P2-0"){
+                innerPlayerArr.push("P2-0");
+            }else if(splitPArr[i]==="P2-1"){
+                innerPlayerArr.push("P2-1");
+            }else{
+                console.log(" PlayerArr index got gliched " + splitPArr[i])}
+         }
+         if(innerMapArr.length<5){
+             
+            if(splitMArr[i]==="0"||splitMArr[i]===0 ){
+                innerMapArr.push(0);
+            }else if(splitMArr[i]==="1"||splitMArr[i]===1){
+                innerMapArr.push(1);
+            }else if(splitMArr[i]==="2"||splitMArr[i]===2){
+                innerMapArr.push(2);
+            }else if(splitMArr[i]==="3"||splitMArr[i]===3){
+                innerMapArr.push(3);
+            }else if(splitMArr[i]==="4"||splitMArr[i]===4){
+                innerMapArr.push(4);
+            }else{
+                console.log(" Map klarte ikke å finne map number ");
+            }
+            if(i===24){
+                resMapArr.push(innerMapArr);
+        } 
+           
+            } else{
+                resMapArr.push(innerMapArr);
+                innerMapArr=[];
+                if(splitMArr[i]==="0"||splitMArr[i]===0 ){
+                    innerMapArr.push(0);
+                }else if(splitMArr[i]==="1"||splitMArr[i]===1){
+                    innerMapArr.push(1);
+                }else if(splitMArr[i]==="2"||splitMArr[i]===2){
+                    innerMapArr.push(2);
+                }else if(splitMArr[i]==="3"||splitMArr[i]===3){
+                    innerMapArr.push(3);
+                }else if(splitMArr[i]==="4"||splitMArr[i]===4){
+                    innerMapArr.push(4);
+                }else{
+                    console.log(" Map klarte ikke å finne map number ");
+                }
+            }
+    }
+    
+    console.log("is this corect?:   ");
+    console.log(resPlayerArr); // her kan jeg exportere player arr fra database
+    console.log(" Map Array : ");
+    console.log(resMapArr);
+
+    //-----------------------Map Array
+
+    previusPlayerPos=resPlayerArr;
+    previusMapPos=resMapArr;
+   // console.log("");
+
+    //playerposArr=resPlayerArr;
+    //mapArr=resMapArr;
+     // dette refresher canvasen med ny verdier
+
+     playerposArr = [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+    ]; 
+    // Må ha to, enten må kun playeren stå i arrayen eller hva nivå bygningen er på 
+    mapArr = [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+    ];
+
+
+    
+   }catch(err){
+        console.log(" URL could not be fetcherd " + err);
+    }
+
+
+}
+
+async function updateDbArr(){
+    let url ="/api/pArr";
+    let update ={
+        id: 1,
+        arr: playerposArr,
+        mar: mapArr
+
+    }
+    let cfg = {
+        method: "PUT",
+        headers: {"Content-type" : "application/json"},
+        body: JSON.stringify(update)
+    }
+    try {
+        let response = await fetch(url, cfg);
+        let data = await response.json();
+        
+    
+        if (response.status != 200) {
+            throw data.error;
+        }
+    }
+    
+    catch(error) {
+        console.log("something went wrong!")
+        console.log(error);
+    }
+
+}
+
+async function sendPlayerArr(){
+    let url ="/api/pArr";
+    let update ={
+        id: 3,
+        arr: pObjet,
+        //mar: mapArr
+
+    }
+    let cfg = {
+        method: "POST",
+        headers: {"Content-type" : "application/json"},
+        body: JSON.stringify(update)
+    }
+    try {
+        let response = await fetch(url, cfg);
+        let data = await response.json();
+        
+    
+        if (response.status != 200) {
+            throw data.error;
+        }
+    }
+    
+    catch(error) {
+        console.log("something went wrong!")
+        console.log(error);
+    }
 }
 
 async function sendRequest(){
@@ -480,4 +694,76 @@ async function getMessages(){
     catch(error) {
         console.log(error);
     }
+}
+
+
+function printPlayerArray(){
+    let idCounter=0;
+    let idDesign = idCounter;
+ for(let i = 0; i < playerposArr.length; i++){
+     let playerarrPosCounter=playerposArr[i].length
+     for(let j = 0;j < playerarrPosCounter; j++){
+         // includes 
+         let checkId= document.getElementById(idCounter);
+        
+         if(playerposArr[i][j]==="P1-0"){
+             checkId.innerText = "P1-0";
+         }else if(playerposArr[i][j] === "P1-1"){
+             checkId.innerText = "P1-1";
+         }else if(playerposArr[i][j] === "P2-0"){
+             checkId.innerText = "P2-0";
+         }else if(playerposArr[i][j] === "P2-1"){
+             checkId.innerText =  "P2-1";
+         }else{
+             checkId.innerText = "";
+         }
+         idCounter++;
+     }
+
+ }
+
+ for(let i = 0; i < mapArr.length; i++){
+     let mapArrCounter =mapArr[i].length
+     
+     for(let j = 0;j < mapArrCounter; j++){
+         // includes 
+         
+         let checkId = document.getElementById(idDesign);
+         console.log(" Check id: " + mapArrCounter);
+        
+         switch(mapArr[i][j]){
+     
+             case 1:
+                 checkId.classList.add("tier1");
+                 break;
+             case 2:
+                
+                 checkId.classList.add("tier2");
+                
+                 break;
+             case 3:
+                 
+                 checkId.classList.add("tier3");
+                 break;
+             case 4:
+                 
+                 checkId.classList.add("tier4");
+                 break;
+         }
+             idDesign++;
+     }
+
+ }
+
+
+}
+function arrChangeToDb(){
+
+    if(previusPlayerPos[0]!==undefined && previusMapPos[0]!==undefined){
+        playerposArr=previusPlayerPos;
+        mapArr=previusMapPos;
+    }   else{
+        console.log(" Vi hentet ikke fra databasen ")
+    }
+    
 }

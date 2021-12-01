@@ -1,5 +1,6 @@
 const express = require("express");
 const pg = require("pg");
+const createCredentials = require("./modules/createCredString");
 const dbURI = "postgres://pvmasarbwjcapq:b9ac1bd34cdfea58b154863227e304c846d5022315f78131578fff5316cc30d8@ec2-34-246-155-237.eu-west-1.compute.amazonaws.com:5432/d1d2ak6c1p140m";
 const connstring = process.env.DATABASE_URL || dbURI;
 const pool = new pg.Pool({
@@ -8,7 +9,6 @@ const pool = new pg.Pool({
 });
 
 const users = require("./routes/users");
-const gameManager = require("./routes/gameManager");
 
 const server = express();
 const PORT = process.env.PORT || 8080;
@@ -19,7 +19,6 @@ server.use(express.json());
 
 server.use(express.static("public"));
 server.use(users);
-//server.use(gameManager);
 
 
 server.get("/msgs", async function(req, res, next){

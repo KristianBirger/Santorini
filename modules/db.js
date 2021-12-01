@@ -49,5 +49,19 @@ dbMethods.deleteUsers = function(id) {
     return pool.query(sql, values);
 }
 
+dbMethods.createGameDB = function(player1ID, player2ID){
+
+    let sql = "INSERT INTO mapinfo WHERE ... "
+    let values = [];
+    return pool.query(sql, values);
+
+}
+
+dbMethods.getGamesDB = function(){
+
+    let sql = "SELECT * id FROM mapinfo";
+    let values = [];
+}
+
 
 module.exports = dbMethods;

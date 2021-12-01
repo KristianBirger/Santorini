@@ -11,17 +11,28 @@
     <h1>Santorini Lobby</h1>
     <button id="playGame">Play Santorini!</button>
     <button id="showGames">Show games</button>
+    <button id="createGame">Create a game</button>
     
     <h3 id="userInfo"></h3>
     <button id="myUser">My user</button>
+    
+    <h2>Public games</h2>
+    <div id="publicGamesContainer"></div>
 
 <script>
 let btn = document.getElementById("playGame");
 let btnShow = document.getElementById("showGames");
 let btnmyUser = document.getElementById("myUser");
+let btnCreateGame = document.getElementById("createGame");
 let userInfo = document.getElementById("userInfo");
 
+let publicContainer = document.getElementById("publicGamesContainer");
+
+
 updateUserInfo();
+
+let IDplayer1 = localStorage.getItem("id");
+
 
 btn.addEventListener("click", function(){
     location.href = "game.html";
@@ -35,7 +46,39 @@ btnmyUser.addEventListener("click", myUser = function(){
     
 })
 
+btn.addEventListener("click", createGame)
 
+async function createGame(){
+
+let url = "/games/createNewGames";
+
+
+
+let updata = {
+
+    player1id :  IDplayer1,
+    player2id : ""
+
+}
+
+let cfg = {
+
+    method: "POST",
+    headers: {"Content-type":"application/json"},
+    body: JSON.stringify(updata)
+
+}
+
+try {
+
+    let response = await fetch(url, cfg);
+
+    
+} catch (error) {
+    console.log(error);
+}
+
+}
 
 
 function updateUserInfo (){
