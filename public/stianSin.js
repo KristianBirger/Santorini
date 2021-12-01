@@ -1,3 +1,4 @@
+
 let htmlTable = document.getElementById("SantoTable");
 let infoText = document.getElementById("infoText");
 let inputChat = document.getElementById("inputChat");
