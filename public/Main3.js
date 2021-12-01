@@ -1,3 +1,6 @@
+//import * as db from "./db.js";
+//let db = require("./db.js");
+
 let htmlTable = document.getElementById("SantoTable");
 let infoText = document.getElementById("infoText");
 let inputChat = document.getElementById("inputChat");
@@ -30,6 +33,7 @@ let pObjet={
     player: playerposArr,
     map: mapArr
 }
+
 let deploymentphase = true; 
 
 let isItPlayer1Turn = true;
@@ -46,10 +50,19 @@ let selectedPawn;
 let isBuilding = false;
 let isMoved=false;
 
+
+
 sendArr();
 function switchTurns(){
     if(!isBuilding){
         isItPlayer1Turn = !isItPlayer1Turn;
+        // sendArr(); dette er en post
+       
+        
+        
+    /*
+    */
+         // venter på database pull er på plass.
     }
     
 
@@ -75,6 +88,7 @@ const tbody = document.querySelector('#SantoTable tbody');
 tbody.addEventListener('click', function (e){
   const cell = e.target.closest('td');
   currentCell = cell;
+  
   //console.log (" isPlayer1 " + isItPlayer1Turn+" isBuilding " + isBuilding +" isPawnSelected "+ isPawnSelected);
   if (!cell) {
     return;
@@ -87,27 +101,27 @@ tbody.addEventListener('click', function (e){
         deployPlayers(cell.id);
     }
 
-    if(deploymentphase && !isItPlayer1Turn && cell.innerHTML === "" && deployCount < 2){
+    else if(deploymentphase && !isItPlayer1Turn && cell.innerHTML === "" && deployCount < 2){
 
         deployPlayers(cell.id);
 
-    }else if(isBuilding && !isPawnSelected && cell.innerHTML === ""&& whereIstand(standingCell,currentCell) ){
+    }else if(isBuilding && !isPawnSelected && cell.innerHTML === "" && whereIstand(standingCell,currentCell) ){
         let currentRow = Math.floor(currentCell.id/5);
         let currentColl = currentCell.id%5;
         
         building(currentRow,currentColl);
-        
+        console.log("Building level ");
+        console.log(mapArr) 
         updatePlayingBoard(selectedPawn);
         isBuilding=false;
-        //console.log("mapArr: ");
-        //console.log(mapArr);// for å se om mapet bygges
+      
     }
 
 
     else if (isItPlayer1Turn && !deploymentphase && !isPawnSelected){
         
         if((cell.innerHTML).includes("P1")){
-            //console.log("uuuh" + (cell.innerHTML).includes("P1"));
+           // console.log("uuuh" + (cell.innerHTML).includes("P1"));
         
         previousCell = currentCell;
         selectedPawn = cell.innerHTML;
@@ -131,7 +145,7 @@ tbody.addEventListener('click', function (e){
     else if(!isItPlayer1Turn && !deploymentphase && !isPawnSelected){
         
         if((cell.innerHTML).includes("P2")){
-           // console.log("uuuh" + (cell.innerHTML).includes("P2"));
+            //console.log("uuuh" + (cell.innerHTML).includes("P2"));
        
         previousCell = currentCell;
         selectedPawn = cell.innerHTML;
@@ -148,43 +162,43 @@ tbody.addEventListener('click', function (e){
         }
 
     }else if((cell.innerHTML).includes("P1")){
-        if(isItPlayer1Turn && !deploymentphase && isPawnSelected){
+        if(isItPlayer1Turn && !deploymentphase && isPawnSelected ){
         previousCell = currentCell;
         selectedPawn = cell.innerHTML;
         selectPawns(selectedPawn);}
     }else if((cell.innerHTML).includes("P2")){
-        if( !isItPlayer1Turn && !deploymentphase && isPawnSelected){
+        if( !isItPlayer1Turn && !deploymentphase && isPawnSelected ){
         previousCell = currentCell;
         selectedPawn = cell.innerHTML;
         selectPawns(selectedPawn);}
     }
 
-    else if(isPawnSelected && cell.innerHTML === ""){
-       
+    else if(isPawnSelected && cell.innerHTML === "" ){
+       // previousCell = currentCell;
         if(whereIstand(previousCell,currentCell)){
-            updatePlayingBoard(selectedPawn);
-            updateArr(cell.id, selectedPawn);
-            findPlayerPosInArr(selectedPawn, previousCell.id);
-            printPlayerArray();
-            }
+        updatePlayingBoard(selectedPawn);
+        updateArr(cell.id, selectedPawn);
+        findPlayerPosInArr(selectedPawn, previousCell.id);
+        printPlayerArray();
+        }
 
     }
+    //updateDbArr();
     updateDbArr();
     getArr();
     arrChangeToDb();
-    
 });
 
-function findPlayerPosInArr(selected, cellId){
-   
-      
+function findPlayerPosInArr(selected, cellId){  
+    
+    
 let column = playerposArr[Math.floor(cellId / 5)].indexOf(selected);
 let row = Math.floor(cellId / 5);
 
 //Remove from array
 playerposArr[row][column] = 0;
 
-    
+
 }
 
 function deployPlayers(cellid){
@@ -199,7 +213,9 @@ function deployPlayers(cellid){
     if (deployCount === 2){
         switchTurns();
         deployCount = 0;
+
     }
+    
 }
     else{
         placeHolderPlayer = `P2-${deployCount}`;
@@ -214,10 +230,12 @@ function deployPlayers(cellid){
             infoText.innerHTML = "Player 1 turn, select a pawn to move";
             
         }
+        
     }
 
     updateArr(cellid, placeHolderPlayer);
     updatePlayingBoard(placeHolderPlayer);
+    //printPlayerArray();
 }
 
 function selectPawns(selectedPawn){
@@ -279,35 +297,39 @@ function addToPlayerPosArr(cellId, cellText) {
         console.log(playerposArr);
 
     }
+    //printInnerHTML();
     return cellId;
 }
 
 function updatePlayingBoard(cellText){
-    
+    //getArr();
     if(deploymentphase){
-       // currentCell.innerHTML = cellText;    
+        //console.log(" Kjører denne 2 ganger? ");
+       
     }
 
     else if(isPawnSelected){
-        
+        standingCell=currentCell;
         if( whereIstand( previousCell, currentCell)){
         //currentCell.innerHTML = cellText;
-        standingCell=currentCell;
+        
         //previousCell.innerHTML = "";
         isPawnSelected = false;
         isBuilding = true;
+         
         if(mapArr[Math.floor(currentCell.id/5)][currentCell.id%5]>2){
             let player = isItPlayer1Turn;
             return winnerCalculator(player);
         }
         switchTurns();
+        
 
         }else{ 
              console.log("Error: is_building " + isBuilding + " is_pawn " +isPawnSelected)
          }
     }else if(isBuilding){
     
-        if(whereIstand(previousCell,currentCell)){
+        if(whereIstand(previousCell,currentCell, null)){
             //console.log(mapArr);
             isBuilding=false;
             switchTurns();
@@ -319,11 +341,14 @@ function updatePlayingBoard(cellText){
     }
     else{
     
+
+ //printInnerHTML();
+
     //currentCell.innerHTML = cellText;
- //   lastCell.innerHTML = "";
+   // lastCell.innerHTML = "";
     }
     printPlayerArray();
-    
+   
 }
 function winnerCalculator(winName){
     let winnerName;
@@ -333,7 +358,7 @@ function winnerCalculator(winName){
     winnerText.innerHTML = " Du want! " + winnerName;
     console.log(" Du want! " + winnerName);
 }
-function whereIstand(oldPos,newPos){
+function whereIstand(oldPos,newPos, currentPos){
     let newPosRow,newPosCol, oldPosRow,oldPosCol;
     
 
@@ -349,11 +374,9 @@ function whereIstand(oldPos,newPos){
         oldPosRow=Math.floor(Math.floor(oldPos.id/5));
     oldPosCol=oldPos.id%5;
     }
-   // oldPosRow=Math.floor(Math.floor(oldPos.id/5));
-    //oldPosCol=oldPos.id%5;
+    
     updateDbArr();
     getArr();
-
     if(oldPosCol===newPosCol && newPosCol === newPosRow && oldPosRow === newPosRow){
         
         return false;
@@ -372,31 +395,12 @@ function whereIstand(oldPos,newPos){
 function building(currentRow,currentColl){
     // dette påvirker koden og burde revurderess.
     console.log("sett building up by 1 ");
-    /*
     let fargelegging=document.getElementById(currentCell.id);
     //let tableHtml=document.getElementById("SantoTable");
     let switchChecker=mapArr[currentRow][currentColl];
-    console.log("Switch checker value? "+ switchChecker);
-    switch(switchChecker){
-        
-        case 0:
-            fargelegging.classList.add("tier1");
-            break;
-        case 1:
-           
-            fargelegging.classList.add("tier2");
-           // fargelegging.classList.remove("tier1");
-            break;
-        case 2:
-            //fargelegging.classList.remove("tier2");
-            fargelegging.classList.add("tier3");
-            break;
-        case 3:
-            //fargelegging.classList.remove("tier3");
-            fargelegging.classList.add("tier4");
-            break;
-    }
-    */
+    //console.log("Switch checker value? "+ switchChecker);
+
+    
     
 
     return mapArr[currentRow][currentColl]++;
@@ -419,18 +423,21 @@ function inRange(old,newer){
 
 //------------------------------------------------------------------- Chat
 
-btnChat.addEventListener("click", sendMessage); 
+btnChat.addEventListener("click", sendMessage);
+ // sender playerArr når klikker på grafen.
 
-function sendArr(){  // sender playerArr når klikker på grafen.
+function sendArr(){
     console.log(" sending player array ");
     sendPlayerArr();
     
 }
+
 function sendMessage (){
 
     console.log("sending message");
+    
     sendRequest();
-    inputChat.value = "";
+    
 
 }
 
@@ -438,7 +445,8 @@ let myInterval;
 
 if(!myInterval){
 
-    myInterval = setInterval(getMessages, 2000);
+    myInterval = setInterval(getMessages, 2000); 
+
 }
 
 async function getArr(){
@@ -647,7 +655,6 @@ async function sendPlayerArr(){
         console.log(error);
     }
 }
-
 async function sendRequest(){
 
     let url = "/msgs";
@@ -696,13 +703,13 @@ async function getMessages(){
             throw data.error;
         }
 
-
         
         let dataReversed = data.reverse();
         dataReversed = data.slice(0,messageLength);
 
         for (let value of dataReversed) {
             
+
             let html = "<h3>" + value.heading + "</h3>";
             html += "<p>" + value.msgbody + "</p>";
             
@@ -720,66 +727,68 @@ async function getMessages(){
 }
 
 
+
 function printPlayerArray(){
-    let idCounter=0;
-    let idDesign = idCounter;
- for(let i = 0; i < playerposArr.length; i++){
-     let playerarrPosCounter=playerposArr[i].length
-     for(let j = 0;j < playerarrPosCounter; j++){
-         // includes 
-         let checkId= document.getElementById(idCounter);
+       let idCounter=0;
+       let idDesign = idCounter;
+    for(let i = 0; i < playerposArr.length; i++){
+        let playerarrPosCounter=playerposArr[i].length
+        for(let j = 0;j < playerarrPosCounter; j++){
+            // includes 
+            let checkId= document.getElementById(idCounter);
+           
+            if(playerposArr[i][j]==="P1-0"){
+                checkId.innerText = "P1-0";
+            }else if(playerposArr[i][j] === "P1-1"){
+                checkId.innerText = "P1-1";
+            }else if(playerposArr[i][j] === "P2-0"){
+                checkId.innerText = "P2-0";
+            }else if(playerposArr[i][j] === "P2-1"){
+                checkId.innerText =  "P2-1";
+            }else{
+                checkId.innerText = "";
+            }
+            idCounter++;
+        }
+
+    }
+
+    for(let i = 0; i < mapArr.length; i++){
+        let mapArrCounter =mapArr[i].length
         
-         if(playerposArr[i][j]==="P1-0"){
-             checkId.innerText = "P1-0";
-         }else if(playerposArr[i][j] === "P1-1"){
-             checkId.innerText = "P1-1";
-         }else if(playerposArr[i][j] === "P2-0"){
-             checkId.innerText = "P2-0";
-         }else if(playerposArr[i][j] === "P2-1"){
-             checkId.innerText =  "P2-1";
-         }else{
-             checkId.innerText = "";
-         }
-         idCounter++;
-     }
-
- }
-
- for(let i = 0; i < mapArr.length; i++){
-     let mapArrCounter =mapArr[i].length
-     
-     for(let j = 0;j < mapArrCounter; j++){
-         // includes 
-         
-         let checkId = document.getElementById(idDesign);
-         console.log(" Check id: " + mapArrCounter);
+        for(let j = 0;j < mapArrCounter; j++){
+            // includes 
+            
+            let checkId = document.getElementById(idDesign);
+            console.log(" Check id: " + mapArrCounter);
+           
+            switch(mapArr[i][j]){
         
-         switch(mapArr[i][j]){
-     
-             case 1:
-                 checkId.classList.add("tier1");
-                 break;
-             case 2:
-                
-                 checkId.classList.add("tier2");
-                
-                 break;
-             case 3:
-                 
-                 checkId.classList.add("tier3");
-                 break;
-             case 4:
-                 
-                 checkId.classList.add("tier4");
-                 break;
-         }
-             idDesign++;
-     }
+                case 1:
+                    checkId.classList.add("tier1");
+                    break;
+                case 2:
+                   
+                    checkId.classList.add("tier2");
+                   // fargelegging.classList.remove("tier1");
+                    break;
+                case 3:
+                    //fargelegging.classList.remove("tier2");
+                    checkId.classList.add("tier3");
+                    break;
+                case 4:
+                    //fargelegging.classList.remove("tier3");
+                    checkId.classList.add("tier4");
+                    break;
+            }
+                idDesign++;
+        }
 
- }
+    }
 
 
 }
+
 function arrChangeToDb(){
 
     if(previusPlayerPos[0]!==undefined && previusMapPos[0]!==undefined){
