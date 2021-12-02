@@ -114,7 +114,7 @@ server.put("/api/pArr", async function(req, res, next) {
     let update= req.body;
     let sql = "UPDATE mapinfo SET playerarr = $1, maparr = $2 WHERE userid = $3";
 	let userid = "jon";
-    let values = [update.arr, update.mar, userid];
+    let values = [update.arr.player, update.arr.map, userid];
     try {
 		let response = await pool.query(sql, values);
 		console.log(response);

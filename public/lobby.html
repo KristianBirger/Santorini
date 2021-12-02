@@ -84,13 +84,22 @@ try {
 
     console.log(data);
 
-    if(response.status = 200){
-        console.log(data.msg);
+    if(response.status === 200){
+        popUp(data.msg);
+    }
+    else{
+
+        if(data.error.code === "23505"){
+        popUp("Name is already taken!")
+        throw "Something went wrong!";
+        
+    }
     }
 
     
 } catch (error) {
-    console.log(error.error);
+    console.log(error);
+    
 }
 
 }
@@ -147,6 +156,10 @@ async function loadGames(){
     }
 
     
+    }
+
+    function popUp(msg){
+        alert(msg);
     }
 
 </script>
