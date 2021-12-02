@@ -107,7 +107,7 @@ let selectedPawn;
 let isBuilding = false;
 let isMoved=false;
 
-sendArr();
+//sendArr();
 function switchTurns(){
     if(!isBuilding){
         isItPlayer1Turn = !isItPlayer1Turn;
@@ -683,10 +683,11 @@ async function sendPlayerArr(){
 async function sendRequest(){
 
     let url = "/msgs";
-
+  
 let updata = {
-    id: "Carlson",
-    msg: inputChat.value
+  msgbody: inputChat.value,
+  userid: "69",
+  gameid: 757
 }
 
 let cfg = {
@@ -724,6 +725,8 @@ async function getMessages(){
         let response = await fetch (url);
         let data = await response.json();
 
+      
+
         if (response.status != 200) {
             throw data.error;
         }
@@ -733,9 +736,10 @@ async function getMessages(){
         let dataReversed = data.reverse();
         dataReversed = data.slice(0,messageLength);
 
+        console.log(dataReversed);
         for (let value of dataReversed) {
             
-            let html = "<h3>" + value.heading + "</h3>";
+            let html = "<h3>" + value.userid + "</h3>";
             html += "<p>" + value.msgbody + "</p>";
             
             let myDiv = document.createElement("div");

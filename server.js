@@ -25,10 +25,11 @@ server.use(gameRouter);
 
 
 server.get("/msgs", async function(req, res, next){
-	let sql = "SELECT * FROM messages";
+	let sql = "SELECT * FROM messages WHERE gameid = $1";
+	let values = ["757"];
 	
 	try {
-		let result = await pool.query(sql);
+		let result = await pool.query(sql, values);
 		res.status(200).json(result.rows).end();
 	} 
 	catch(err) {
@@ -37,18 +38,22 @@ server.get("/msgs", async function(req, res, next){
 });
 
 server.post("/msgs", async function (req, res, next) {
-    console.log(req.body.msg);
+    
 
 	let updata = req.body;
-	let userid = "1"; 
 
-	let sql = "INSERT INTO messages (id, date , heading, msgbody, userid) VALUES(DEFAULT, DEFAULT, $1, $2, $3) returning *";
-	let values = [updata.id, updata.msg, userid];
+	console.log(updata);
+
+
+	let sql = "INSERT INTO messages (id, date, msgbody, userid, gameid) VALUES(DEFAULT, DEFAULT, $1, $2, $3)";
+	let values = [updata.msgbody, updata.userid, updata.gameid];
 	
 	try {
 		let result = await pool.query(sql, values);
 		
-		if (result.rows.length > 0) {
+		//console.log(result);
+
+		if (result.rowCount > 0) {
 			res.status(200).json({msg: "Message was created"}).end();
 			console.log("Message created");	
 		}
@@ -117,9 +122,11 @@ server.put("/api/pArr", async function(req, res, next) {
     let sql = "UPDATE mapinfo SET playerarr = $1, maparr = $2 WHERE userid = $3";
 	let userid = "jon";
     let values = [update.arr.player, update.arr.map, userid];
+	
     try {
 		let response = await pool.query(sql, values);
 		console.log(response);
+		
 		if (response.rowCount > 0) {
 			res.status(200).json({msg: "PUT request was created!"}).end();
 			console.log("PUT request was created!");	

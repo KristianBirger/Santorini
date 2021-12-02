@@ -38,8 +38,10 @@ loadGames();
 let IDplayer1 = localStorage.getItem("id");
 
 
-btn.addEventListener("click", function(){
-    location.href = "game.html";
+btn.addEventListener("click", async function(){
+
+
+
 })
 
 btnRefresh.addEventListener("click", loadGames);
@@ -130,8 +132,6 @@ async function loadGames(){
         let response = await fetch(url, cfg);
         let data = await response.json();
 
-        console.log(data);
-
         if (response.status != 200) {
 
             console.log(data.error);
@@ -139,24 +139,28 @@ async function loadGames(){
         }
 
 
-        for (value in data){
+        for (value of data){
 
         let myDiv = document.createElement("div");
         let btnGame = document.createElement("button");
-        myDiv.innerHTML = data[value].id
+        btnGame.innerHTML = "Join";
+        myDiv.innerHTML = value.id
+        let newUrl = value.url;
+
+        console.log(newUrl);
         
+        myDiv.appendChild(btnGame);
 
         btnGame.addEventListener("click",async function(){
-
-            localStorage.setItem("url", X);
-            location.href = "game.html";
+            
+           location.href = `/game/${newUrl}`;
 
         });
 
         publicContainer.appendChild(myDiv);
         }
 
-        console.log("The data " + data[0].username);
+        
         
 
     } catch (error) {

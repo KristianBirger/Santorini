@@ -35,8 +35,6 @@ router.get("/games/showGames", async function(req, res, next) {
         
         let data = await db.getGamesDBlist();
 
-        console.log(data);
-
         res.status(200).send(data.rows).end();
 
     } catch (error) {
