@@ -17,6 +17,8 @@
     <button id="myUser">My user</button>
     
     <h2>Public games</h2>
+    <button id="btnRefresh">Refresh</button>
+    <br><br>    
     <div id="publicGamesContainer"></div>
 
 <script>
@@ -24,12 +26,14 @@ let btn = document.getElementById("playGame");
 let btnShow = document.getElementById("showGames");
 let btnmyUser = document.getElementById("myUser");
 let btnCreateGame = document.getElementById("createGame");
+let btnRefresh = document.getElementById("btnRefresh");
 let userInfo = document.getElementById("userInfo");
 
 let publicContainer = document.getElementById("publicGamesContainer");
 
 
 updateUserInfo();
+loadGames();
 
 let IDplayer1 = localStorage.getItem("id");
 
@@ -38,7 +42,8 @@ btn.addEventListener("click", function(){
     location.href = "game.html";
 })
 
-btnShow.addEventListener("click", loadGames)
+btnRefresh.addEventListener("click", loadGames);
+//btnShow.addEventListener("click", loadGames)
    
 btnmyUser.addEventListener("click", myUser = function(){
 
@@ -46,19 +51,22 @@ btnmyUser.addEventListener("click", myUser = function(){
     
 })
 
-btn.addEventListener("click", createGame)
+btnCreateGame.addEventListener("click", createGame);
+
+
 
 async function createGame(){
 
-let url = "/games/createNewGames";
+let url = "/games/createNewGame";
+
+let inpGameName = prompt("Please enter a name");
 
 
 
 let updata = {
-
-    player1id :  IDplayer1,
+    gameName: inpGameName,
+    player1id : IDplayer1,
     player2id : ""
-
 }
 
 let cfg = {
@@ -72,10 +80,17 @@ let cfg = {
 try {
 
     let response = await fetch(url, cfg);
+    let data = await response.json();
+
+    console.log(data);
+
+    if(response.status = 200){
+        console.log(data.msg);
+    }
 
     
 } catch (error) {
-    console.log(error);
+    console.log(error.error);
 }
 
 }
@@ -91,18 +106,22 @@ function updateUserInfo (){
 
 async function loadGames(){
 
-        let token = localStorage.getItem("token");
-    let url = "/activeGames";
+    let token = localStorage.getItem("token");
+    let url = "/games/showGames";
 
     let cfg = {
         method: "GET",
-        headers: {"authorization": token}
+        headers: {"Content-type":"application/json"},
     };
+
+    publicContainer.innerHTML = "";
 
     try {
         
         let response = await fetch(url, cfg);
         let data = await response.json();
+
+        
 
         if (response.status != 200) {
 
@@ -110,6 +129,15 @@ async function loadGames(){
 
         }
 
+
+        for (value in data){
+
+        let myDiv = document.createElement("div");
+        myDiv.innerHTML = data[value].id
+        
+        publicContainer.appendChild(myDiv);
+
+        }
 
         console.log("The data " + data[0].username);
         

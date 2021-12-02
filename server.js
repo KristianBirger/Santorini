@@ -19,7 +19,7 @@ server.use(express.json());
 
 server.use(express.static("public"));
 server.use(users);
-//server.use(gameManager);
+server.use(gameManager);
 
 
 server.get("/msgs", async function(req, res, next){

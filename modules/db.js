@@ -49,18 +49,35 @@ dbMethods.deleteUsers = function(id) {
     return pool.query(sql, values);
 }
 
-dbMethods.createGameDB = function(player1ID, player2ID){
+dbMethods.createGameDB = function(gameName, player1ID, player2ID){
 
-    let sql = "INSERT INTO mapinfo WHERE ... "
-    let values = [];
+    let sql = "INSERT INTO mapinfo (heading, playerarr, maparr, userid, id, time) VALUES($1, $2, $3, $4, DEFAULT, DEFAULT) returning *";
+
+    let mapArr = [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+    ]; 
+
+    let playerArr = [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+    ]; 
+
+    let values = [gameName, playerArr, mapArr, player1ID];
     return pool.query(sql, values);
 
 }
 
 dbMethods.getGamesDB = function(){
 
-    let sql = "SELECT * id FROM mapinfo";
-    let values = [];
+    let sql = "SELECT id FROM mapinfo";
+    return pool.query(sql);
 }
 
 
