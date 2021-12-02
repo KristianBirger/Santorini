@@ -395,9 +395,10 @@ function inRange(old,newer){
 //------------------------------------------------------------------- Chat
 
 btnChat.addEventListener("click", sendMessage);
-tbody.addEventListener("click", sendArr); // sender playerArr når klikker på grafen.
+//tbody.addEventListener("click", sendArr); // sender playerArr når klikker på grafen.
 
 function sendArr(){
+
     console.log(" sending player array ");
     sendPlayerArr();
 }

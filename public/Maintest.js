@@ -57,7 +57,7 @@ function switchTurns(){
     if(!isBuilding){
         isItPlayer1Turn = !isItPlayer1Turn;
         // sendArr(); dette er en post
-       
+        arrChangeToDb();
         
         
     /*
@@ -110,9 +110,10 @@ tbody.addEventListener('click', function (e){
         let currentColl = currentCell.id%5;
         
         building(currentRow,currentColl);
-        console.log("Building level ");
-        console.log(mapArr) 
+        //console.log("Building level ");
+        //console.log(mapArr) 
         updatePlayingBoard(selectedPawn);
+        updateDbArr();
         isBuilding=false;
       
     }
@@ -174,7 +175,7 @@ tbody.addEventListener('click', function (e){
     }
 
     else if(isPawnSelected && cell.innerHTML === "" ){
-       // previousCell = currentCell;
+        previousCell = currentCell;
         if(whereIstand(previousCell,currentCell)){
         updatePlayingBoard(selectedPawn);
         updateArr(cell.id, selectedPawn);
@@ -186,7 +187,7 @@ tbody.addEventListener('click', function (e){
     //updateDbArr();
     updateDbArr();
     getArr();
-    arrChangeToDb();
+   
 });
 
 function findPlayerPosInArr(selected, cellId){  
@@ -210,13 +211,13 @@ function deployPlayers(cellid){
     console.log("Player 1 turn");
 
     deployCount ++;
-    if (deployCount === 2){
-        switchTurns();
-        deployCount = 0;
+        if (deployCount === 2){
+            switchTurns();
+            deployCount = 0;
 
-    }
+        }
     
-}
+    }
     else{
         placeHolderPlayer = `P2-${deployCount}`;
         console.log("Player 2 turn");
@@ -232,9 +233,12 @@ function deployPlayers(cellid){
         }
         
     }
-
+   
     updateArr(cellid, placeHolderPlayer);
     updatePlayingBoard(placeHolderPlayer);
+    updateDbArr();
+    //getArr();
+    // arrChangeToDb();
     //printPlayerArray();
 }
 
@@ -329,7 +333,7 @@ function updatePlayingBoard(cellText){
          }
     }else if(isBuilding){
     
-        if(whereIstand(previousCell,currentCell, null)){
+        if(whereIstand(previousCell,currentCell)){
             //console.log(mapArr);
             isBuilding=false;
             switchTurns();
@@ -347,7 +351,7 @@ function updatePlayingBoard(cellText){
     //currentCell.innerHTML = cellText;
    // lastCell.innerHTML = "";
     }
-    printPlayerArray();
+    //printPlayerArray();
    
 }
 function winnerCalculator(winName){
@@ -362,34 +366,38 @@ function whereIstand(oldPos,newPos, currentPos){
     let newPosRow,newPosCol, oldPosRow,oldPosCol;
     
 
-    newPosRow=Math.floor(Math.floor(newPos.id/5));
+    newPosRow=Math.floor(newPos.id/5);
     newPosCol=newPos.id%5;
     if(currentPos === undefined && oldPos === undefined ){
-
+console.log(" Kan ikke gå til venstre");
     }
     else if(oldPos === undefined){
-        oldPosRow=Math.floor(Math.floor(currentPos.id/5));
+        oldPosRow=Math.floor(currentPos.id/5);
         oldPosCol=currentPos.id%5;
+        console.log(" oldPos er undefined ");
     }else{
-        oldPosRow=Math.floor(Math.floor(oldPos.id/5));
+        oldPosRow=Math.floor(oldPos.id/5);
     oldPosCol=oldPos.id%5;
+    console.log(" else skjedde ");
     }
     
-    updateDbArr();
-    getArr();
+    
+    
     if(oldPosCol===newPosCol && newPosCol === newPosRow && oldPosRow === newPosRow){
-        
+        console.log(" where I stand faila pga du velger til venstre ");
         return false;
     }
     else if(inRange(oldPosCol, newPosCol) && inRange(oldPosRow, newPosRow) && inRange(mapArr[oldPosRow][oldPosCol], mapArr[newPosRow][newPosCol]) && inRange(mapArr[newPosRow][newPosCol], mapArr[oldPosRow][oldPosCol])){
-      
+        console.log(" where I stand faila pga du velger til venstre  true ");
         return true;
     }else if(inRange(oldPosCol, newPosCol) && inRange(oldPosRow, newPosRow)  && isBuilding){
-        
+        console.log(" where I stand faila pga du velger til venstre  ture");
         return true;
     }else{
         return console.log("Error: oldPos "+ oldPos + ", NewPos: " + newPos) ;
     }
+    //updateDbArr();
+    //getArr();
 }
 
 function building(currentRow,currentColl){
@@ -427,7 +435,8 @@ btnChat.addEventListener("click", sendMessage);
  // sender playerArr når klikker på grafen.
 
 function sendArr(){
-    console.log(" sending player array ");
+
+    console.log(" poster array ");
     sendPlayerArr();
     
 }
@@ -457,79 +466,72 @@ async function getArr(){
     let resMapArr=[];
 
     try{
-    let getArr = await fetch(url);
-   
+    let getArr = await fetch(url);   
     let data = await getArr.json();
-
+   
+    
     
     //console.log(data);
     //console.log("Player " + data[0].playerarr);// data av array index tror jeg
     //console.log("Map "+data[0].maparr);
-    let pArrValue;
-    let mArrValue;
-
-    for(value of data){
-        let player=data[value].playerarr;
-        let map=data[value].maparr;
-         pArrValue=player.replaceAll("\"","").replaceAll("{","").replaceAll("}","");
-         mArrValue=map.replaceAll("}","").replaceAll("{","").replaceAll("\"","");
-
-    }
-    let splitMArr=mArrValue.split(",");
-    let splitPArr = pArrValue.split(",");
-    console.log("split mar: ");
-    console.log(splitMArr);
-    console.log("split par: ");
-    console.log(splitPArr);
     
-    for (let i=0;  i < splitPArr.length; i++){
+//console.log(data[0].playerarr.replaceAll("{", "").replaceAll("\"", "").replaceAll("}","").split(","));
+    let player = data[0].playerarr.replaceAll("{", "").replaceAll("\"", "").replaceAll("}","").split(",");
+    let map = data[0].maparr.replaceAll("{", "").replaceAll("\"", "").replaceAll("}","").split(",")
+//console.log("dette er resultat: " + player);
+
+
+    //console.log("split mar: "  + map);
+    
+    for (let i=0;  i < player.length; i++){
         if(innerPlayerArr.length<5){
-            if(splitPArr[i]==="0"||splitPArr[i]===0 ){
-                innerPlayerArr.push(0);
-            }else if(splitPArr[i]==="P1-0"){
-                console.log(" sjer dette dårlig tid? p1");
+             if(player[i]==="P1-0"){
+                console.log(" pushet p1-0 !!!");
                 innerPlayerArr.push("P1-0");
-            }else if(splitPArr[i]==="P1-1"){
-                console.log(" sjer dette dårlig tid? p11");
+            }else if(player[i]==="P1-1"){
+                console.log(" pushet p1-1 !!!");
                 innerPlayerArr.push("P1-1");
-            }else if(splitPArr[i]==="P2-0"){
-                console.log(" sjer dette dårlig tid? p2");
+            }else if(player[i]==="P2-0"){
+                console.log(" pushet p2-0 !!!");
                 innerPlayerArr.push("P2-0");
-            }else if(splitPArr[i]==="P2-1"){
-                console.log(" sjer dette dårlig tid? p22");
+            }else if(player[i]==="P2-1"){
+                console.log(" pushet p2-1 !!!");
                 innerPlayerArr.push("P2-1");
+            }if(player[i]==="0"||player[i]===0 ){
+                innerPlayerArr.push(0);
             }else{
-                console.log(" PlayerArr index got gliched " + splitPArr[i])}
+                console.log(" PlayerArr index got gliched " + player[i])}
             if(i===24){
                     resPlayerArr.push(innerPlayerArr);
             } 
          }else{
             resPlayerArr.push(innerPlayerArr);
             innerPlayerArr=[];
-            if(splitPArr[i]==="0"||splitPArr[i]===0 ){
-                innerPlayerArr.push(0);
-            }else if(splitPArr[i]==="P1-0"){
+            if(player[i]==="P1-0"){
                 innerPlayerArr.push("P1-0");
-            }else if(splitPArr[i]==="P1-1"){
+            }else if(player[i]==="P1-1"){
                 innerPlayerArr.push("P1-1");
-            }else if(splitPArr[i]==="P2-0"){
+            }else if(player[i]==="P2-0"){
                 innerPlayerArr.push("P2-0");
-            }else if(splitPArr[i]==="P2-1"){
+            }else if(player[i]==="P2-1"){
                 innerPlayerArr.push("P2-1");
-            }else{
-                console.log(" PlayerArr index got gliched " + splitPArr[i])}
+            }else if(player[i]==="0" || player[i] ===0){
+                innerPlayerArr.push(0);
+            }
+            else{
+                console.log(" PlayerArr index got gliched " + player[i])}
          }
          if(innerMapArr.length<5){
              
-            if(splitMArr[i]==="0"||splitMArr[i]===0 ){
+            if(map[i]==="0"||map[i]===0 ){
                 innerMapArr.push(0);
-            }else if(splitMArr[i]==="1"||splitMArr[i]===1){
+            }else if(map[i]==="1"||map[i]===1){
                 innerMapArr.push(1);
-            }else if(splitMArr[i]==="2"||splitMArr[i]===2){
+            }else if(map[i]==="2"||map[i]===2){
                 innerMapArr.push(2);
-            }else if(splitMArr[i]==="3"||splitMArr[i]===3){
+            }else if(map[i]==="3"||map[i]===3){
                 innerMapArr.push(3);
-            }else if(splitMArr[i]==="4"||splitMArr[i]===4){
+            }else if(map[i]==="4"||map[i]===4){
                 innerMapArr.push(4);
             }else{
                 console.log(" Map klarte ikke å finne map number ");
@@ -541,15 +543,15 @@ async function getArr(){
             } else{
                 resMapArr.push(innerMapArr);
                 innerMapArr=[];
-                if(splitMArr[i]==="0"||splitMArr[i]===0 ){
+                if(map[i]==="0"||map[i]===0 ){
                     innerMapArr.push(0);
-                }else if(splitMArr[i]==="1"||splitMArr[i]===1){
+                }else if(map[i]==="1"||map[i]===1){
                     innerMapArr.push(1);
-                }else if(splitMArr[i]==="2"||splitMArr[i]===2){
+                }else if(map[i]==="2"||map[i]===2){
                     innerMapArr.push(2);
-                }else if(splitMArr[i]==="3"||splitMArr[i]===3){
+                }else if(map[i]==="3"||map[i]===3){
                     innerMapArr.push(3);
-                }else if(splitMArr[i]==="4"||splitMArr[i]===4){
+                }else if(map[i]==="4"||map[i]===4){
                     innerMapArr.push(4);
                 }else{
                     console.log(" Map klarte ikke å finne map number ");
@@ -572,26 +574,10 @@ async function getArr(){
     //mapArr=resMapArr;
      // dette refresher canvasen med ny verdier
 
-     playerposArr = [
-        [0,0,0,0,0],
-        [0,0,0,0,0],
-        [0,0,0,0,0],
-        [0,0,0,0,0],
-        [0,0,0,0,0]
-    ]; 
-    // Må ha to, enten må kun playeren stå i arrayen eller hva nivå bygningen er på 
-    mapArr = [
-        [0,0,0,0,0],
-        [0,0,0,0,0],
-        [0,0,0,0,0],
-        [0,0,0,0,0],
-        [0,0,0,0,0]
-    ];
-
 
     
    }catch(err){
-        console.log(" URL could not be fetcherd " + err);
+        console.log(" Reading DB whent to catch " + err);
     }
 
 
@@ -632,7 +618,7 @@ async function sendPlayerArr(){
     let update ={
         id: 3,
         arr: pObjet,
-        //mar: mapArr
+        mar: mapArr
 
     }
     let cfg = {
@@ -760,7 +746,7 @@ function printPlayerArray(){
             // includes 
             
             let checkId = document.getElementById(idDesign);
-            console.log(" Check id: " + mapArrCounter);
+            //console.log(" Check id: " + mapArrCounter);
            
             switch(mapArr[i][j]){
         
@@ -781,7 +767,7 @@ function printPlayerArray(){
                     checkId.classList.add("tier4");
                     break;
             }
-                idDesign++;
+            idDesign++;  
         }
 
     }
@@ -790,10 +776,14 @@ function printPlayerArray(){
 }
 
 function arrChangeToDb(){
+    console.log("Dette er previus playuer pos og map pos: ")
+    console.log(previusPlayerPos);
+    console.log(previusMapPos)
 
-    if(previusPlayerPos[0]!==undefined && previusMapPos[0]!==undefined){
+    if(previusPlayerPos[0]!==undefined && previusMapPos[0]!== undefined){
         playerposArr=previusPlayerPos;
-        mapArr=previusMapPos;
+        console.log(mapArr)
+        //mapArr=previusMapPos;
     }   else{
         console.log(" Vi hentet ikke fra databasen ")
     }
