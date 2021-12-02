@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santorini</title>
+</head>
+<body>
+
+<h1>Login</h1>
+
+<input type="text" id="inpUsername" placeholder="Username">
+<input type="text" id="inpPassword" placeholder="Password">
+
+<button id="btnLogin">Login</button>
+
+<h3>Create new user</h3>
+
+<input type="text" id="createUsername" placeholder="Username">
+<input type="text" id="createPassword" placeholder="Password">
+<button id="btnCreateU">Create user</button>
+
+<h3 id="info"></h3>
+
+<script>
+
+let btnLogin = document.getElementById("btnLogin");
+let inpUsername = document.getElementById("inpUsername");
+let inpPassword = document.getElementById("inpPassword");
+let inpCreateUsername = document.getElementById("createUsername");
+let inpCreatePassword = document.getElementById("createPassword");
+let btnCreateU = document.getElementById("btnCreateU");
+let infotext = document.getElementById("info");
+
+
+btnLogin.addEventListener("click",async function(){
+
+    console.log("clicked");
+
+    let url = "/users/login";
+
+    let updata = {
+
+        username : inpUsername.value.trim(),
+        password : inpPassword.value.trim()
+    }
+
+    let cfg = {    
+
+    method: "POST",
+    headers: {"Content-type":"application/json"},
+    body: JSON.stringify(updata)
+}
+
+try {
+    let response = await fetch(url, cfg);
+    let data = await response.json();
+
+    if(data.verified){
+        console.log("Password was correct");
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("username", data.username);
+        localStorage.setItem("id", data.id);
+        console.log(data.id);
+        location.href = "lobby.html";
+    }
+    else{
+        console.log(data.error);
+        showFeedBack(data.error);
+    }
+}
+
+catch(error) {
+    console.log("something went wrong!")
+    console.log(error);
+}
+
+
+  //  location.href = "game.html"
+
+});
+
+btnCreateU.addEventListener("click", sendCreateUser);
+
+async function sendCreateUser(){
+
+let url = "/users";
+let credString = createCredString(inpCreateUsername.value, inpCreatePassword.value);
+
+
+
+let cfg = {
+    method: "POST",
+    headers: {"authorization": credString}
+}
+
+try {
+    let response = await fetch(url, cfg);
+    let data = await response.json();
+    
+
+    if (response.status != 200) {
+        console.log(data.error);
+        showFeedBack(data.error);
+    }
+    else {
+
+        showFeedBack(`User: ${inpCreateUsername.value} was sucessfully created`);
+
+    }
+}
+
+catch(error) {
+    console.log("something went wrong!")
+    console.log(error);
+}
+
+
+}
+
+function createCredString(username, password){
+
+let combinedStr = username + ":" + password;
+//let b64Str = Buffer.from(combinedStr).toString("base64"); 
+let b64Str = btoa(combinedStr); 
+
+return `basic ${b64Str}`;
+}
+
+function showFeedBack (errortext){
+    infotext.innerHTML = errortext;
+}
+
+
+</script>
+
+</body>
+</html>
