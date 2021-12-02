@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h1 id="myUser">Hello user!</h1>
+
+    <h2>Change username</h2>
+    <input id="inpNewusername" placeholder="Input the new username">
+    <br><br>
+    <button id="btnNewUsername">Ok</button>
+
+    <h2>Change password</h2>
+    <input id="inpOldPassword" placeholder="Input the old password">
+    <br><br>
+    <input id="inpNewPassword" placeholder="Input the new password">
+    <br><br>
+    <input id="inpNewPasswordRepeat" placeholder="Repeat the new password">
+    <br><br>
+    <button id="btnNewpassword">Ok</button>
+
+    <h3>Delete me!</h3>
+    <button id="deleteThisUser">Delete me now!</button>
+
+    <h2 id="info">hello</h2>
+    
+<script>
+
+
+let myHeading = document.getElementById("myUser");
+let btnDeleteUser = document.getElementById("deleteThisUser");
+let btnUpdateUsername = document.getElementById("btnNewUsername");
+let infoText = document.getElementById("info");
+
+let inpNewUsername = document.getElementById("inpNewusername");
+let inpOldPass = document.getElementById("inpOldPassword");
+let inpNewPassword = document.getElementById("inpNewPassword");
+let inpNewPasswordRepeat = document.getElementById("inpNewPasswordRepeat");
+
+let myUsername = localStorage.getItem("username");
+let myId = localStorage.getItem("id");
+let myToken = localStorage.getItem("token");
+
+
+verifyToken();
+myHeading.innerHTML = `Hello ${myUsername}`
+
+
+btnUpdateUsername.addEventListener("click", updateUsername);
+btnDeleteUser.addEventListener("click",deleteThisUser)
+
+async function updateUsername(){
+
+    let url ="/users/updateName";
+    
+    let update ={
+        id: myId,
+        oldUsername: myUsername,
+        newUsername: inpNewUsername.value
+    }
+
+    let cfg = {
+        method: "PUT",
+        headers: {"Content-type" : "application/json",
+                   "authorization": myToken              
+                 },
+        body: JSON.stringify(update)
+    }
+    try {
+        let response = await fetch(url, cfg);
+        let data = await response.json();
+
+
+        if (response.status != 200) {
+            throw data.error;
+            infoText.innerHTML = data.error
+        }
+        else{
+
+            infoText.innerHTML = data.msg;
+            myHeading.innerHTML = `Hello ${data.newUsername}`
+
+        }
+
+        
+    }
+
+    catch(error) {
+        console.log("something went wrong!")
+        console.log(error);
+        infoText.innerHTML = error;
+    }
+}
+   
+async function updatePassword(){
+
+    let oldpass = inpOldPass.value;
+    let newPassword;
+
+    if(inpNewPassword.value === inpNewPasswordRepeat.value){
+
+    //.......................
+
+    }
+    else{
+
+        infoText.innerHTML = "Not matching passwords!";
+    }
+
+    let url ="/users/updatePassword";
+
+    let update ={
+        id: myId,
+        username: myUsername,
+        oldPassword: oldpass,
+        newPassword: newPassword
+            }
+
+    let cfg = {
+        method: "PUT",
+        headers: {"Content-type" : "application/json",
+                   "authorization": myToken              
+                 },
+        body: JSON.stringify(update)
+    }
+    try {
+        let response = await fetch(url, cfg);
+        let data = await response.json();
+
+
+        if (response.status != 200) {
+            throw data.error;
+            infoText.innerHTML = data.error
+        }
+        else{
+
+            infoText.innerHTML = data.msg;
+            myHeading.innerHTML = `Hello ${data.newUsername}`
+
+        }
+
+        
+    }
+
+    catch(error) {
+        console.log("something went wrong!")
+        infoText.innerHTML = error;
+    }
+
+}
+
+async function deleteThisUser(){
+    let url = "/user";
+
+    let cfg = {    
+
+    method: "DELETE",
+    headers: {"authorization": myToken,
+                 "id": myId 
+                                        }
+}
+
+try {
+    let response = await fetch(url, cfg);
+    let data = await response.json();
+
+    if(data.status = 200){
+
+        console.log(data.msg);
+        alert(`The user: ${myUsername}, was deleted`);
+        localStorage.clear();
+        location.href = "index.html";
+        
+    }
+    else{
+        console.log(data.error);
+    }
+}
+
+catch(error) {
+    console.log("Failed to delete user!")
+    console.log(error);
+}
+}
+
+async function verifyToken(){
+
+    let url = "/verify";
+
+    let cfg = {    
+
+    method: "POST",
+    headers: {"authorization": myToken,
+              "id": myId 
+                }
+}
+
+try {
+    let response = await fetch(url, cfg);
+    let data = await response.json();
+
+    if(data.response != 200){
+        console.log("You are not welcome");
+    }
+    else {
+        console.log("Token verification ok");
+    }
+}
+
+catch(error) {
+    console.log(error);
+}
+}
+
+
+
+
+
+
+</script>
+</body>
+</html>

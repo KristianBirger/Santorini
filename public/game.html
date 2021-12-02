@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="./buildingLayer.css">
+  
+    <title>Santorini</title>
+    
+</head>
+<body>
+  
+    <h1 id ="jimbo"></h1>
+
+        <table id="SantoTable" class="tg" style="table-layout: fixed; width: 300px; height: 300px">
+          <tr>
+            <td id="0" class="tg-0lax"></td>
+            <td id="1" class="tg-0lax"></td>
+            <td id="2" class="tg-0lax"></td>
+            <td id="3" class="tg-0lax"></td>
+            <td id="4" class="tg-0lax"></td>
+          </tr>
+          <tr>
+            <td id="5" class="tg-0lax"></td>
+            <td id="6" class="tg-0lax"></td>
+            <td id="7" class="tg-0lax"></td>
+            <td id="8" class="tg-0lax"></td>
+            <td id="9" class="tg-0lax"></td>
+          </tr>
+          <tr>
+            <td id="10" class="tg-0lax"></td>
+            <td id="11" class="tg-0lax"></td>
+            <td id="12" class="tg-0lax"></td>
+            <td id="13" class="tg-0lax"></td>
+            <td id="14" class="tg-0lax"></td>
+          </tr>
+          <tr>
+            <td id="15" class="tg-0lax"></td>
+            <td id="16" class="tg-0lax"></td>
+            <td id="17" class="tg-0lax"></td>
+            <td id="18" class="tg-0lax"></td>
+            <td id="19" class="tg-0lax"></td>
+          </tr>
+          <tr>
+            <td id="20" class="tg-0lax"></td>
+            <td id="21" class="tg-0lax"></td>
+            <td id="22" class="tg-0lax"></td>
+            <td id="23" class="tg-0lax"></td>
+            <td id="24" class="tg-0lax"></td>
+          </tr>
+         
+        </table>
+
+   
+    <button class= "collapsible" > Game Rules</button>
+        <div class="content"> <p>
+
+            The buildings are represented by colours: Rank 1: Green, Rank 2: Blue, Rank 3: Yellow and Rank 4: Red
+            <br>   
+            Santorini is a re-imagining of the purely abstract 2004 edition. Since its original inception over 30 years ago, Santorini has been continually developed, enhanced and refined by designer Gordon Hamilton.
+
+            Santorini is an accessible strategy game, simple enough for an elementary school classroom while aiming to provide gameplay depth and content for hardcore gamers to explore, The rules are simple. Each turn consists of 2 steps:
+            <p>
+            1. Move - move one of your builders into a neighboring space. You may move your Builder Pawn on the same level, step-up one level, or step down any number of levels.
+
+            2. Build - Then construct a building level adjacent to the builder you moved. When building on top of the third level, place a dome instead, removing that space from play.
+        </p>
+            Winning the game - If either of your builders reaches the third level, you win.
+
+        </p></div>
+
+        <h2 id="infoText">Hello</h2>
+
+        <input type="text" id="inputChat" placeholder="Bm your opponent!">
+        <button id="btnSend">Send the Bm!</button>
+        <div id="chatContainer"></div>
+
+        <script>
+
+let htmlTable = document.getElementById("SantoTable");
+let infoText = document.getElementById("infoText");
+let inputChat = document.getElementById("inputChat");
+let btnChat = document.getElementById("btnSend");
+let chatContainer = document.getElementById("chatContainer");
+
+
+let standingCell;
+//let p1a = {};
+//let p1b = {};
+
+let playerposArr = [
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0]
+]; 
+// Må ha to, enten må kun playeren stå i arrayen eller hva nivå bygningen er på 
+let mapArr = [
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0],
+    [0,0,0,0,0]
+];
+let previusPlayerPos=[];
+//let previusMapPos=[];
+let previusMapPos=[];
+
+let pObjet={}
+let deploymentphase = true; 
+
+let isItPlayer1Turn = true;
+
+let isPawnSelected = false;
+
+let winnerState = false;
+
+let currentCell;
+let previousCell;
+
+let findUrlId=  window.location.href;
+let arrayRegURL=findUrlId.split("/");
+let selectedPawn; 
+let isBuilding = false;
+let isMoved=false;
+
+//sendArr();
+const coll = document.getElementsByClassName("collapsible");
+for (let i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+
+
+setInterval(arrChangeToDb,1500);
+
+function switchTurns(){
+    if(!isBuilding){
+        isItPlayer1Turn = !isItPlayer1Turn;
+       // arrChangeToDb();
+    }
+    
+
+    if( isItPlayer1Turn && isBuilding && !deploymentphase){
+       
+        infoText.innerHTML="Player 1 turn, Select place to build";
+    }
+    else if(!isItPlayer1Turn && !deploymentphase && isBuilding){
+        infoText.innerHTML = "Player 2 turn, Select place to build"
+    }
+    else if(!isItPlayer1Turn && !deploymentphase) {
+        infoText.innerHTML = "Player 2 turn, select a pawn to move";
+        
+    }else if(isItPlayer1Turn && !deploymentphase){
+        infoText.innerHTML = "Player 1 turn, select a pawn to move";
+
+    };
+};
+
+let deployCount = 0;
+//if (){}
+const tbody = document.querySelector('#SantoTable tbody');
+tbody.addEventListener('click', function (e){
+  const cell = e.target.closest('td');
+  currentCell = cell;
+  
+  if (!cell) {
+    return;
+    }
+    
+
+    //Player 1 deploy
+    if(deploymentphase && isItPlayer1Turn && cell.innerHTML === "" && deployCount < 2){
+
+        deployPlayers(cell.id); 
+    }
+
+    if(deploymentphase && !isItPlayer1Turn && cell.innerHTML === "" && deployCount < 2){
+
+        deployPlayers(cell.id);
+
+    }else if(isBuilding && !isPawnSelected && cell.innerHTML === ""&& whereIstand(standingCell,currentCell) ){
+        let currentRow = Math.floor(currentCell.id/5);
+        let currentColl = currentCell.id%5;
+        
+        building(currentRow,currentColl);
+        
+        updatePlayingBoard(selectedPawn);
+        updateDbArr();
+        isBuilding=false;
+        
+    }
+
+
+    else if (isItPlayer1Turn && !deploymentphase && !isPawnSelected){
+        
+        if((cell.innerHTML).includes("P1")){
+        
+        previousCell = currentCell;
+        selectedPawn = cell.innerHTML;
+
+        if(isBuilding===false){
+        selectPawns(selectedPawn);}
+        if(mapArr[Math.floor(currentCell.id/5)][currentCell.id%5]>2){
+            let player = isItPlayer1Turn;
+            return winnerCalculator(player);
+        }
+        
+        }
+        else{
+            infoText.innerHTML = "Wrong pawn my guy!";
+        }
+
+       
+        
+        
+    }
+    else if(!isItPlayer1Turn && !deploymentphase && !isPawnSelected){
+        
+        if((cell.innerHTML).includes("P2")){
+          
+       
+        previousCell = currentCell;
+        selectedPawn = cell.innerHTML;
+        if(isBuilding===false){
+        selectPawns(selectedPawn);}
+      
+        if(mapArr[Math.floor(currentCell.id/5)][currentCell.id%5]>2){
+            let player = isItPlayer1Turn;
+            return winnerCalculator(player);
+        }
+        }
+        else{
+            infoText.innerHTML = "Wrong pawn my guy!";
+        }
+
+    }else if((cell.innerHTML).includes("P1")){
+        if(isItPlayer1Turn && !deploymentphase && isPawnSelected){
+        previousCell = currentCell;
+        selectedPawn = cell.innerHTML;
+        selectPawns(selectedPawn);}
+        updateDbArr();
+    }else if((cell.innerHTML).includes("P2")){
+        if( !isItPlayer1Turn && !deploymentphase && isPawnSelected){
+        previousCell = currentCell;
+        selectedPawn = cell.innerHTML;
+        selectPawns(selectedPawn);}
+        updateDbArr();
+    }
+
+    else if(isPawnSelected && cell.innerHTML === ""){
+       
+        if(whereIstand(previousCell,currentCell)){
+        
+            updatePlayingBoard(selectedPawn);
+            updateArr(cell.id, selectedPawn);
+            findPlayerPosInArr(selectedPawn, previousCell.id);
+            printPlayerArray();
+            }
+
+    }
+    
+    getArr();
+    
+    
+});
+
+function findPlayerPosInArr(selected, cellId){
+   
+    
+let column = cellId%5;
+let row = Math.floor(cellId / 5);
+
+
+playerposArr[row][column] = 0;
+
+    
+}
+
+function deployPlayers(cellid){
+
+    let placeHolderPlayer; 
+
+    if(isItPlayer1Turn){
+    placeHolderPlayer = `P1-${deployCount}`;
+    console.log("Player 1 turn");
+
+    deployCount ++;
+    if (deployCount === 2){
+        switchTurns();
+        deployCount = 0;
+    }
+}
+    else{
+        placeHolderPlayer = `P2-${deployCount}`;
+        console.log("Player 2 turn");
+
+        deployCount ++;
+        
+        if (deployCount === 2){
+            switchTurns();
+            deploymentphase = false;
+            console.log("Deployment phase over")
+            infoText.innerHTML = "Player 1 turn, select a pawn to move";
+            
+        }
+    }
+
+    updateArr(cellid, placeHolderPlayer);
+    updatePlayingBoard(placeHolderPlayer);
+    
+    updateDbArr();
+}
+
+function selectPawns(selectedPawn){
+
+console.log("The selected pawn is " + selectedPawn);
+
+isPawnSelected = true;
+
+}
+
+
+function updateArr (cellId, cellText){
+
+    return addToPlayerPosArr(cellId, cellText);
+    
+}
+    
+
+function addToPlayerPosArr(cellId, cellText) {
+    if (cellId < 5) {
+
+        playerposArr[0][cellId] = cellText;
+
+    }
+    else if (cellId > 4 && cellId < 10) {
+
+        cellId = cellId % 5;
+
+        playerposArr[1][cellId] = cellText;
+
+        
+    }
+    else if (cellId > 9 && cellId < 15) {
+
+        cellId = cellId % 5;
+
+        playerposArr[2][cellId] = cellText;
+
+
+    }
+    else if (cellId > 14 && cellId < 20) {
+
+        cellId = cellId % 5;
+
+        playerposArr[3][cellId] = cellText;
+
+
+    }
+    else if (cellId > 13 && cellId < 25) {
+
+        cellId = cellId % 5;
+
+        playerposArr[4][cellId] = cellText;
+
+
+    }
+    return cellId;
+}
+
+function updatePlayingBoard(cellText){
+   
+    if(deploymentphase){
+       
+    }
+
+    else if(isPawnSelected){
+            
+        if( whereIstand( previousCell, currentCell)){
+
+        standingCell=currentCell;
+        isPawnSelected = false;
+        isBuilding = true;
+        if(mapArr[Math.floor(currentCell.id/5)][currentCell.id%5]>2){
+            let player = isItPlayer1Turn;
+            return winnerCalculator(player);
+        }
+        switchTurns();
+
+        }else{ 
+             console.log("Error: is_building " + isBuilding + " is_pawn " +isPawnSelected)
+         }
+    }else if(isBuilding){
+    
+        if(whereIstand(previousCell,currentCell)){
+            isBuilding=false;
+            switchTurns();
+            
+        }else{
+            isBuilding=false;
+            switchTurns();
+        }
+    }
+    else{
+    
+    }
+    printPlayerArray();
+   
+}
+function winnerCalculator(winName){
+    let winnerName;
+    if(winName)winnerName=" Player 1 ";
+    if(!winName)winnerName=" Player 2";
+    let winnerText= document.getElementById("jimbo");
+    winnerText.innerHTML = " Du want! " + winnerName;
+  
+    
+}
+function whereIstand(oldPos,newPos, currentPos){
+    let newPosRow,newPosCol, oldPosRow,oldPosCol;
+    
+
+    newPosRow=Math.floor(Math.floor(newPos.id/5));
+    newPosCol=newPos.id%5;
+    if(currentPos === undefined && oldPos === undefined ){
+
+    }
+    else if(oldPos === undefined){
+        oldPosRow=Math.floor(Math.floor(currentPos.id/5));
+        oldPosCol=currentPos.id%5;
+    }else{
+        oldPosRow=Math.floor(Math.floor(oldPos.id/5));
+    oldPosCol=oldPos.id%5;
+    }
+   
+
+    if(oldPosCol===newPosCol && newPosCol === newPosRow && oldPosRow === newPosRow){
+        
+        return false;
+    }
+    else if(inRange(oldPosCol, newPosCol) && inRange(oldPosRow, newPosRow) && inRange(mapArr[oldPosRow][oldPosCol], mapArr[newPosRow][newPosCol]) && inRange(mapArr[newPosRow][newPosCol], mapArr[oldPosRow][oldPosCol])){
+      
+        return true;
+    }else if(inRange(oldPosCol, newPosCol) && inRange(oldPosRow, newPosRow)  && isBuilding){
+        
+        return true;
+    }else{
+        
+    }
+}
+
+function building(currentRow,currentColl){
+   
+     mapArr[currentRow][currentColl]++;
+     updateDbArr();
+};
+function inRange(old,newer){
+    
+    let max=old+1;
+    let min=old-1;
+        if(min<0){
+            min=0;
+        return ((newer-min)*(newer-max)<=0);
+    }else if(max >5){
+        max=5;
+        return ((newer-min)*(newer-max)<=0);
+    }
+    else{
+        return ((newer-min)*(newer-max)<=0);
+    }
+}
+
+//------------------------------------------------------------------- Chat
+
+btnChat.addEventListener("click", sendMessage); 
+
+function sendArr(){  // sender playerArr når klikker på grafen.
+ 
+    sendPlayerArr();
+    
+}
+function sendMessage (){
+
+    sendRequest();
+    inputChat.value = "";
+
+}
+
+let myInterval;
+
+if(!myInterval){
+
+    myInterval = setInterval(getMessages, 2000);
+}
+
+async function getArr(){
+    let url = "/api/parr";
+    let innerPlayerArr=[];
+    let resPlayerArr=[];
+    let innerMapArr=[];
+    let resMapArr=[];
+
+    try{
+    let getArr = await fetch(url);   
+    let data = await getArr.json();
+   
+    let findUrlId= " thisUrl:" + window.location.href;
+    let arrayRegURL=findUrlId.split("/");
+    let numberOfURL = parseInt(arrayRegURL[arrayRegURL.length-1]);
+  
+
+    let player = data[0].playerarr.replaceAll("{", "").replaceAll("\"", "").replaceAll("}","").split(",");
+    let map = data[0].maparr.replaceAll("{", "").replaceAll("\"", "").replaceAll("}","").split(",")
+   
+  
+    for (let i=0;  i < player.length; i++){
+        if(innerPlayerArr.length<5){
+             if(player[i]==="P1-0"){
+               
+                innerPlayerArr.push("P1-0");
+            }else if(player[i]==="P1-1"){
+                
+                innerPlayerArr.push("P1-1");
+            }else if(player[i]==="P2-0"){
+                
+                innerPlayerArr.push("P2-0");
+            }else if(player[i]==="P2-1"){
+                
+                innerPlayerArr.push("P2-1");
+            }if(player[i]==="0"||player[i]===0 ){
+                innerPlayerArr.push(0);
+            }else{
+            }
+            if(i===24){
+                    resPlayerArr.push(innerPlayerArr);
+            } 
+         }else{
+            resPlayerArr.push(innerPlayerArr);
+            innerPlayerArr=[];
+            
+            if(player[i]==="P1-0"){
+                innerPlayerArr.push("P1-0");
+            }else if(player[i]==="P1-1"){
+                innerPlayerArr.push("P1-1");
+            }else if(player[i]==="P2-0"){
+                innerPlayerArr.push("P2-0");
+            }else if(player[i]==="P2-1"){
+                innerPlayerArr.push("P2-1");
+            }else if(player[i]==="0" || player[i] ===0){
+                innerPlayerArr.push(0);
+            }
+            else{
+                console.log(" PlayerArr index got gliched " + player[i])}
+         }
+         if(innerMapArr.length<5){
+             
+            if(map[i]==="0"|| map[i]===0 ){
+                innerMapArr.push(0);
+            }else if(map[i]==="1"|| map[i]===1){
+                innerMapArr.push(1);
+            }else if(map[i]==="2"|| map[i]===2){
+                innerMapArr.push(2);
+            }else if(map[i]==="3"|| map[i]===3){
+                innerMapArr.push(3);
+            }else if(map[i]==="4"|| 
+            map[i]===4){
+                innerMapArr.push(4);
+            }else{
+                
+            }
+            if(i===24){
+                resMapArr.push(innerMapArr);
+        } 
+           
+            } else{
+                resMapArr.push(innerMapArr);
+                innerMapArr=[];
+                if(map[i]==="0"||map[i]===0 ){
+                    innerMapArr.push(0);
+                }else if(map[i]==="1"||map[i]===1){
+                    innerMapArr.push(1);
+                }else if(map[i]==="2"||map[i]===2){
+                    innerMapArr.push(2);
+                }else if(map[i]==="3"||map[i]===3){
+                    innerMapArr.push(3);
+                }else if(map[i]==="4"||map[i]===4){
+                    innerMapArr.push(4);
+                }else{
+                   
+                }
+            }
+    }
+  
+    //-----------------------Map Array
+
+    previusPlayerPos=resPlayerArr;
+    previusMapPos=resMapArr;
+ 
+    
+   }catch(err){
+        
+    }
+
+}
+
+
+async function updateDbArr(){
+    let url ="/api/pArr";
+    pObjet={ player: playerposArr, map: mapArr};
+    
+    let numberOfURL = arrayRegURL[arrayRegURL.length-1];
+      
+    let update ={
+        id: 1,
+        arr: pObjet,
+        id: numberOfURL,
+        userid: getUserId(),
+  
+
+    }
+    let cfg = {
+        method: "PUT",
+        headers: {"Content-type" : "application/json"},
+        body: JSON.stringify(update)
+    }
+    try {
+        let response = await fetch(url, cfg);
+        let data = await response.json();
+        
+    
+        if (response.status != 200) {
+            throw data.error;
+        }
+    }
+    
+    catch(error) {
+        console.log("something went wrong!")
+        console.log(error);
+    }
+
+}
+
+async function sendPlayerArr(){
+    let url ="/api/pArr";
+    pObjet={ player: playerposArr, map: mapArr}
+   
+    let update ={
+        id: 3,
+        arr: pObjet
+        //mar: mapArr
+
+    }
+    let cfg = {
+        method: "POST",
+        headers: {"Content-type" : "application/json"},
+        body: JSON.stringify(update)
+    }
+    try {
+        let response = await fetch(url, cfg);
+        let data = await response.json();
+        
+    
+        if (response.status != 200) {
+            throw data.error;
+        }
+    }
+    
+    catch(error) {
+        console.log("something went wrong!")
+        console.log(error);
+    }
+}
+
+async function sendRequest(){
+
+let url = "/msgs";
+
+let gameId = findGameUrl();
+
+let userid = localStorage.getItem("username");
+
+let updata = {
+  msgbody: inputChat.value,
+  userid: userid,
+  gameid: gameId
+}
+
+let cfg = {
+    method: "POST",
+    headers: {"Content-type":"application/json"},
+    body: JSON.stringify(updata)
+}
+
+try {
+    let response = await fetch(url, cfg);
+    let data = await response.json();
+    
+
+    if (response.status != 200) {
+        throw data.error;
+    }
+}
+
+catch(error) {
+    console.log("something went wrong!")
+    console.log(error);
+}
+
+}
+
+
+
+async function getUserId(){
+    let url = "/api/pArr";
+    
+    try{
+        let response = await fetch (url);
+        let data = await response.json();
+
+        if (response.status != 200) {
+            throw data.error;
+        }
+      
+        let numberOfURL = arrayRegURL[arrayRegURL.length-1];
+ 
+        
+
+        for (let value of data) {
+      
+            if(value.url === numberOfURL){
+            
+            return value.userid;
+        }
+        }
+            
+        }
+        
+    
+    catch(error) {
+        console.log(error);
+    }
+}
+
+async function getMessages(){
+    let url = "/msgs";
+    const messageLength = 6;
+    chatContainer.innerHTML = "";
+    let gameId = findGameUrl();
+    let cfg = {
+    method: "GET",
+    headers: {"Content-type":"application/json",
+                url: gameId}
+}
+
+    try{
+        let response = await fetch (url, cfg);
+        let data = await response.json();
+
+      
+
+        if (response.status != 200) {
+            throw data.error;
+        }
+
+
+        
+        let dataReversed = data.reverse();
+        dataReversed = data.slice(0,messageLength);
+
+        for (let value of dataReversed) {
+            
+            let html = "<h3>" + value.userid + "</h3>";
+            html += "<p>" + value.msgbody + "</p>";
+            
+            let myDiv = document.createElement("div");
+            myDiv.innerHTML = html;
+            
+            chatContainer.appendChild(myDiv);
+            
+        }
+        
+    }
+    catch(error) {
+        console.log(error);
+    }
+}
+
+
+function printPlayerArray(){
+    let idCounter=0;
+    let idDesign = idCounter;
+ for(let i = 0; i < playerposArr.length; i++){
+     let playerarrPosCounter=playerposArr[i].length
+     for(let j = 0;j < playerarrPosCounter; j++){
+         // includes 
+         let checkId= document.getElementById(idCounter);
+        
+         if(playerposArr[i][j]==="P1-0"){
+             checkId.innerText = "P1-0";
+         }else if(playerposArr[i][j] === "P1-1"){
+             checkId.innerText = "P1-1";
+         }else if(playerposArr[i][j] === "P2-0"){
+             checkId.innerText = "P2-0";
+         }else if(playerposArr[i][j] === "P2-1"){
+             checkId.innerText =  "P2-1";
+         }else{
+             checkId.innerText = "";
+         }
+         idCounter++;
+     }
+
+ }
+
+ for(let i = 0; i < mapArr.length; i++){
+     let mapArrCounter =mapArr[i].length
+     
+     for(let j = 0;j < mapArrCounter; j++){
+       
+         
+         let checkId = document.getElementById(idDesign);
+        
+         switch(mapArr[i][j]){
+     
+             case 1:
+                 checkId.classList.add("tier1");
+                 break;
+             case 2:
+                
+                 checkId.classList.add("tier2");
+                
+                 break;
+             case 3:
+                 
+                 checkId.classList.add("tier3");
+                 break;
+             case 4:
+                 
+                 checkId.classList.add("tier4");
+                 break;
+         }
+             idDesign++;
+     }
+
+ }
+
+}
+
+function findGameUrl(){
+
+let findUrlId = window.location.href;
+let arrayRegURL = findUrlId.split("/");
+let numberOfURL = arrayRegURL[arrayRegURL.length-1];
+
+return numberOfURL;
+
+}
+
+function arrChangeToDb(){
+  
+if(playerposArr === previusPlayerPos){
+        playerposArr=previusPlayerPos;
+        mapArr=previusMapPos;
+    }    else{
+        
+    }
+    
+}
+        </script>
+
+</body>
+<style type="text/css">
+    .tg  {border-collapse:collapse;border-spacing:0;}
+.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
+  font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+
+.tier1{
+   
+    background-color: rgb(0, 255, 34);
+ 
+}
+.tier2{
+    background-color: rgb(0, 17, 255);
+}
+.tier3{
+    background-color: rgb(251, 255, 0);
+}
+.tier4{
+    background-color: red;
+}
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+.content {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
+    </style>
+</html>
