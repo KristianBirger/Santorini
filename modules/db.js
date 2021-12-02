@@ -76,7 +76,7 @@ dbMethods.createGameDB = function(gameName, player1ID, player2ID, gameUrl){
 
 dbMethods.getGamesDBlist = function(){
 
-    let sql = "SELECT id, url FROM mapinfo";
+    let sql = "SELECT id, url, heading FROM mapinfo";
     return pool.query(sql);
 }
 
