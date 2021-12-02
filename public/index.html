@@ -36,8 +36,6 @@ let infotext = document.getElementById("info");
 
 btnLogin.addEventListener("click",async function(){
 
-    console.log("clicked");
-
     let url = "/users/login";
 
     let updata = {
@@ -58,26 +56,22 @@ try {
     let data = await response.json();
 
     if(data.verified){
-        console.log("Password was correct");
+
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", data.username);
         localStorage.setItem("id", data.id);
-        console.log(data.id);
         location.href = "lobby.html";
     }
     else{
-        console.log(data.error);
+        
         showFeedBack(data.error);
     }
 }
 
 catch(error) {
-    console.log("something went wrong!")
+
     console.log(error);
 }
-
-
-  //  location.href = "game.html"
 
 });
 
@@ -87,7 +81,6 @@ async function sendCreateUser(){
 
 let url = "/users";
 let credString = createCredString(inpCreateUsername.value, inpCreatePassword.value);
-
 
 
 let cfg = {
@@ -101,7 +94,7 @@ try {
     
 
     if (response.status != 200) {
-        console.log(data.error);
+
         showFeedBack(data.error);
     }
     else {
@@ -122,7 +115,6 @@ catch(error) {
 function createCredString(username, password){
 
 let combinedStr = username + ":" + password;
-//let b64Str = Buffer.from(combinedStr).toString("base64"); 
 let b64Str = btoa(combinedStr); 
 
 return `basic ${b64Str}`;

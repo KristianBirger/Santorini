@@ -78,7 +78,6 @@ async function updateUsername(){
 
         if (response.status != 200) {
             throw data.error;
-            console.log(data.error);
             infoText.innerHTML = data.error
         }
         else{
@@ -100,12 +99,8 @@ async function updateUsername(){
    
 async function updatePassword(){
 
-    //check old pass
-
     let oldpass = inpOldPass.value;
     let newPassword;
-
-    //matching new passwords
 
     if(inpNewPassword.value === inpNewPasswordRepeat.value){
 
@@ -116,8 +111,6 @@ async function updatePassword(){
 
         infoText.innerHTML = "Not matching passwords!";
     }
-
-    //send new hash and salt
 
     let url ="/users/updatePassword";
 
@@ -142,7 +135,6 @@ async function updatePassword(){
 
         if (response.status != 200) {
             throw data.error;
-            console.log(data.error);
             infoText.innerHTML = data.error
         }
         else{
@@ -157,17 +149,12 @@ async function updatePassword(){
 
     catch(error) {
         console.log("something went wrong!")
-        console.log(error);
         infoText.innerHTML = error;
     }
 
 }
 
 async function deleteThisUser(){
-
-    console.log(`Deleting the user with id ${myId}`);
-
-
     let url = "/user";
 
     let cfg = {    
@@ -181,8 +168,6 @@ async function deleteThisUser(){
 try {
     let response = await fetch(url, cfg);
     let data = await response.json();
-
-    console.log(data);
 
     if(data.status = 200){
 
@@ -205,7 +190,6 @@ catch(error) {
 
 async function verifyToken(){
 
-
     let url = "/verify";
 
     let cfg = {    
@@ -219,8 +203,6 @@ async function verifyToken(){
 try {
     let response = await fetch(url, cfg);
     let data = await response.json();
-
-    console.log(data);
 
     if(data.response != 200){
         console.log("You are not welcome");

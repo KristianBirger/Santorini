@@ -45,7 +45,7 @@ btn.addEventListener("click", async function(){
 })
 
 btnRefresh.addEventListener("click", loadGames);
-//btnShow.addEventListener("click", loadGames)
+
    
 btnmyUser.addEventListener("click", myUser = function(){
 
@@ -83,8 +83,6 @@ try {
 
     let response = await fetch(url, cfg);
     let data = await response.json();
-
-    console.log(data);
 
     if(response.status === 200){
         popUp(data.msg);
@@ -146,8 +144,6 @@ async function loadGames(){
         btnGame.innerHTML = "Join";
         myDiv.innerHTML = value.id
         let newUrl = value.url;
-
-        console.log(newUrl);
         
         myDiv.appendChild(btnGame);
 

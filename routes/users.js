@@ -4,7 +4,7 @@ const db = require("../modules/db");
 const authUtils = require("../modules/auth_utils");
 const utils = require("../modules/auth_utils");
 const protect = require("../modules/authToken");
-//const { response } = require("express");
+
 const router = express.Router();
 
 
@@ -33,8 +33,6 @@ router.post("/users/login", async function(req, res, next){
 
                 
                let tok = authUtils.createToken(UserInfoFromDB.rows[rowN].username, UserInfoFromDB.rows[rowN].id)
-            
-                console.log(UserInfoFromDB.rows[rowN].userid);
 
                 res.status(200).json({
                                     msg: "Matching passwords!",
@@ -76,8 +74,6 @@ router.post("/users", async function(req, res, next){
 
         let data = await db.createUsers(cred.username, hash.value, hash.salt);
 
-        console.log("Logging data: " + data);
-
         if (data.rows.length > 0) {
             res.status(200).json({msg: "The user was created successfully"}).end();
         }
@@ -100,7 +96,6 @@ router.post("/users", async function(req, res, next){
 router.put("/users/updateName", protect, async function(req, res, next){
 
 let update = req.body;
-console.log(update);
 
 try {
     let data = await db.updateUser(update.newUsername, update.id);
@@ -110,7 +105,6 @@ try {
         res.status(200).json({msg: `New username set to ${update.username}`,
                               newUsername: update.newUsername}).end();
 
-        console.log("PUT request was created!");
     }
 
 }
@@ -121,7 +115,6 @@ catch(error) {
     }
 
     console.log("something went wrong at PUT " + error);
-   // res.status(500).json({error: error}).end();
 }
 
 
@@ -174,7 +167,6 @@ router.delete("/user", protect, async function(req, res, next) {
     try {
         
         let data = await db.deleteUsers(myid);
-        console.log(data);
         if(data.rows.length > 0){
             res.status(200).json({msg: "The user was deleted"}).end();
         }
@@ -192,11 +184,6 @@ router.delete("/user", protect, async function(req, res, next) {
 });
 
 router.get("/activeGames", protect, async function(req, res, next) {
-
-   // console.log(res.locals.username);
-    //console.log(res.locals.userid);
-
-
 
     try {
 

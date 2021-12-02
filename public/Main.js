@@ -406,7 +406,7 @@ function inRange(old,newer){
 
 btnChat.addEventListener("click", sendMessage); 
 
-function sendArr(){  // sender playerArr når klikker på grafen.
+function sendArr(){  
     console.log(" sending player array ");
     sendPlayerArr();
     

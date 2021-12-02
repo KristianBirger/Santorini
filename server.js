@@ -25,8 +25,10 @@ server.use(gameRouter);
 
 
 server.get("/msgs", async function(req, res, next){
+	let data = req.headers;
+
 	let sql = "SELECT * FROM messages WHERE gameid = $1";
-	let values = ["757"];
+	let values = [data.url]
 	
 	try {
 		let result = await pool.query(sql, values);
@@ -38,24 +40,18 @@ server.get("/msgs", async function(req, res, next){
 });
 
 server.post("/msgs", async function (req, res, next) {
-    
 
 	let updata = req.body;
-
-	console.log(updata);
-
 
 	let sql = "INSERT INTO messages (id, date, msgbody, userid, gameid) VALUES(DEFAULT, DEFAULT, $1, $2, $3)";
 	let values = [updata.msgbody, updata.userid, updata.gameid];
 	
 	try {
 		let result = await pool.query(sql, values);
-		
-		//console.log(result);
 
 		if (result.rowCount > 0) {
 			res.status(200).json({msg: "Message was created"}).end();
-			console.log("Message created");	
+		
 		}
 		else {
 			throw("The message could not be sendt");
@@ -70,8 +66,7 @@ server.post("/msgs", async function (req, res, next) {
 });
 
 server.get("/api/pArr", async function(req, res, next){
-    console.log(" You got it! ");
-	//2const gameID = req.params.id
+
 	let sql = "SELECT * FROM mapinfo";
 	
 	try {
@@ -84,20 +79,14 @@ server.get("/api/pArr", async function(req, res, next){
 });
 
 
-// post 1 time when game starts
-server.post("/api/pArr", async function(req, res, next) {
-    //console.log(req.body.mar);
 
-    //const playerArr =  req.body.arr;
-   // const mapArr = req.body.mar;
-	
+server.post("/api/pArr", async function(req, res, next) {
     let update= req.body;
-	console.log(req.body)
+
 	let userid = "jon";
 
     let sql = "INSERT INTO mapinfo (id, date , heading, playerarr, maparr, userid) VALUES(DEFAULT, DEFAULT, DEFAULT, $1, $2, $3) returning *";
-    //let sql = "Update mapinfo set playerarr = $4, maparr = $5, userid = $6 where id = $1";
-	//let userid= "2";
+   
     let values = [update.arr.player, update.arr.map, userid];
 
     try {
@@ -105,7 +94,7 @@ server.post("/api/pArr", async function(req, res, next) {
 		
 		if (response.rows.length > 0) {
 			res.status(200).json({msg: "Message was created"}).end();
-			console.log("Message created");	
+			
 		}
 		else {
 			throw("The message could not be sendt");
@@ -116,7 +105,8 @@ server.post("/api/pArr", async function(req, res, next) {
 		res.status(500).json({error: error}).end();
 	}
 });
-// userid string/navn type charlson, mens id er random tall
+
+
 server.put("/api/pArr", async function(req, res, next) {
     let update= req.body;
     let sql = "UPDATE mapinfo SET playerarr = $1, maparr = $2 WHERE userid = $3";
@@ -125,18 +115,17 @@ server.put("/api/pArr", async function(req, res, next) {
 	
     try {
 		let response = await pool.query(sql, values);
-		console.log(response);
+		
 		
 		if (response.rowCount > 0) {
 			res.status(200).json({msg: "PUT request was created!"}).end();
-			console.log("PUT request was created!");	
+				
 		}
 		else {
 			throw("The PUT request could not be sendt!");
 		}
 	}
 	catch(error) {
-		console.log("something went wrong at PUT " + error);
 		res.status(500).json({error: error}).end();
 	}
 });
