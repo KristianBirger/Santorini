@@ -74,11 +74,17 @@ dbMethods.createGameDB = function(gameName, player1ID, player2ID, gameUrl){
 
 }
 
-dbMethods.getGamesDB = function(url){
+dbMethods.getGamesDBlist = function(){
 
-    let sql = `SELECT playerarr, maparr FROM mapinfo WHERE url = ${url}`;
+    let sql = "SELECT id FROM mapinfo";
     return pool.query(sql);
 }
 
+dbMethods.getGamesDB = function(url){
+
+    let sql = `SELECT playerarr, maparr FROM mapinfo WHERE url = $1`;
+    values = [url];
+    return pool.query(sql, values);
+}
 
 module.exports = dbMethods;

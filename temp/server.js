@@ -1,3 +1,13 @@
+dbMethods.getGamesDB = function(url){
+
+    let sql = `SELECT playerarr, maparr FROM mapinfo WHERE url = $1`;
+    values = [url];
+    return pool.query(sql, values);
+}
+
+
+
+
 const express = require("express");
 const pg = require("pg");
 const createCredentials = require("./modules/createCredString");

@@ -9,6 +9,7 @@ const pool = new pg.Pool({
 
 const users = require("./routes/users");
 const gameManager = require("./routes/gameManager");
+const gameRouter = require("./public/gameRouter");
 
 const server = express();
 const PORT = process.env.PORT || 8080;
@@ -20,6 +21,7 @@ server.use(express.json());
 server.use(express.static("public"));
 server.use(users);
 server.use(gameManager);
+server.use(gameRouter);
 
 
 server.get("/msgs", async function(req, res, next){

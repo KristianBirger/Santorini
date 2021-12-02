@@ -33,7 +33,9 @@ router.get("/games/showGames", async function(req, res, next) {
 
     try {
         
-        let data = await db.getGamesDB();
+        let data = await db.getGamesDBlist();
+
+        console.log(data);
 
         res.status(200).send(data.rows).end();
 
@@ -43,11 +45,28 @@ router.get("/games/showGames", async function(req, res, next) {
 
 });
 
-router.get("/games/:url", async function(req,res,next) {
+/*router.get("/game/:url", async function(req,res,next) {
     
+    urldb = req.params.url
+    console.log(urldb);
     
 
-});
+
+    res.sendFile(__dirname + "/test.html");
+    try {
+    
+        let data = await db.getGamesDB(urldb);
+        //console.log(data);
+      
+        //res.status(200).send(data.rows).end();
+
+
+    } catch (error) {
+        
+    } 
+    
+
+}); */
 
 router.get("/test/:jimmy", (req,res,next) =>{
    test = req.params.jimmy;
@@ -61,7 +80,7 @@ function createGameUrl(){
 
     gameId = Math.floor(Math.random() * 1000);
 
-    url = `/games/${gameId}`;
+    url = gameId;
 
     console.log(url);
 

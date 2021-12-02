@@ -130,7 +130,7 @@ async function loadGames(){
         let response = await fetch(url, cfg);
         let data = await response.json();
 
-        
+        console.log(data);
 
         if (response.status != 200) {
 
@@ -142,10 +142,18 @@ async function loadGames(){
         for (value in data){
 
         let myDiv = document.createElement("div");
+        let btnGame = document.createElement("button");
         myDiv.innerHTML = data[value].id
         
-        publicContainer.appendChild(myDiv);
 
+        btnGame.addEventListener("click",async function(){
+
+            localStorage.setItem("url", X);
+            location.href = "game.html";
+
+        });
+
+        publicContainer.appendChild(myDiv);
         }
 
         console.log("The data " + data[0].username);
